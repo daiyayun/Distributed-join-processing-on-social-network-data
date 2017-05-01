@@ -3,8 +3,10 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "Graph.hpp"
+
 Graph::Graph(string path){
 	using namespace std;
 	string line;
@@ -25,4 +27,10 @@ Graph::Graph(string path){
 	else std::cerr<<"Unable to open file"<<endl;
 }
 
+void Graph::order(vector<unsigned int> perm){	
+	this->perm=perm;
+	relation.sort(compare);
+}
+
 Graph::~Graph(){}
+

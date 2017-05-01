@@ -1,26 +1,22 @@
 #include <string>
-#include <list>
-#include <fstream>
 #include <iostream>
+#include "Graph.hpp"
 
 //#include "Graph.hpp"
 int main(void){
 	using namespace std;
-	string line;
 	const string path = "../twitter.dat.txt";
-	ifstream myfile(path.c_str());
-	if(myfile.is_open()){
-		while(getline(myfile,line)){
-			//write data into the class
-			// istringstream iss(line);
-			// string s;
-			// list<unsigned int> tuple;
-			// while(getline(iss, s, ' ')){
-			// 	tuple.push_back(stoi(s));
-			// }
-			// relation.push_back(tuple);
-		}
-		myfile.close();
+	Graph g(path);
+	cerr <<g.getSize()<<endl<<g.getArity()<<endl;
+	cerr <<g.relation.front().front()<<endl;
+	cerr<<g.relation.front().back()<<endl;
+	vector<unsigned int> p;
+	p.push_back(1);
+	p.push_back(2);
+	g.order(p);
+	list<list<unsigned int>>::iterator it;
+	for(it = g.relation.begin(); it != g.relation.end(); it++){
+		cout << (*it).front() << endl;
 	}
-	else std::cerr<<"Unable to open file"<<endl;
+
 }
