@@ -1,9 +1,9 @@
 #include <string>
-#include <list>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 #include "Graph.hpp"
 
@@ -16,7 +16,7 @@ Graph::Graph(string path){
 			//write data into the class
 			istringstream iss(line);
 			string s;
-			list<unsigned int> tuple;
+			vector<unsigned int> tuple;
 			while(getline(iss, s, ' ')){
 				tuple.push_back(stoi(s));
 			}
@@ -27,10 +27,25 @@ Graph::Graph(string path){
 	else std::cerr<<"Unable to open file"<<endl;
 }
 
-void Graph::order(vector<unsigned int> perm){	
-	this->perm=perm;
-	relation.sort(Local(perm));
+void Graph::order(vector<unsigned int> perm){
+	using namespace std;	
+	sort(this->relation.begin(),this->relation.end(),Local(perm));
 }
+
+
+void Graph::saveTo(string path){
+	using namespace std;
+	ofstream myfile(path.c_str());
+	if(myfile.is_open()){
+		vector<vector<unsigned int>>::iterator it;
+		for(it = relation.begin(); it != relation.end(); it++){
+			myfile << (*it).front() <<" "<<(*it).back()<< endl;
+		}
+		myfile.close();
+	}
+	else cerr<<"Unable to open file";
+}
+
 
 Graph::~Graph(){}
 
