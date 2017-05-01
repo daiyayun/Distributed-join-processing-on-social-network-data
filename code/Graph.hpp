@@ -14,7 +14,11 @@ public:
 	int getSize(){return relation.size();}
 	int getArity(){return relation.front().size();}
 	void order(vector<unsigned int> perm);
-	bool compare(list<unsigned int> l1, list<unsigned int> l2){
+	struct Local{
+		vector<unsigned int> perm;
+		Local(vector<unsigned int> perm){this->perm=perm;}
+
+		bool operator()(list<unsigned int> l1, list<unsigned int> l2){
 			int n=perm.size();
 			vector<unsigned int> prio(n);
 			int i=0;
@@ -48,5 +52,7 @@ public:
 			}
 			return false;
 		}
+	};
+
 };
 

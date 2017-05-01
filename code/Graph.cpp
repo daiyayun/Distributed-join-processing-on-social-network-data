@@ -29,7 +29,7 @@ Graph::Graph(string path){
 
 void Graph::order(vector<unsigned int> perm){	
 	this->perm=perm;
-	relation.sort(compare);
+	relation.sort(Local(perm));
 }
 
 Graph::~Graph(){}
