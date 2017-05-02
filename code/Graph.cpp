@@ -35,11 +35,19 @@ void Graph::order(vector<unsigned int> perm){
 
 void Graph::saveTo(string path){
 	using namespace std;
+	int l=getArity();
 	ofstream myfile(path.c_str());
 	if(myfile.is_open()){
 		vector<vector<unsigned int>>::iterator it;
 		for(it = relation.begin(); it != relation.end(); it++){
-			myfile << (*it).front() <<" "<<(*it).back()<< endl;
+			int i=0;
+			for(vector<unsigned int>::iterator jt=it->begin();jt!=it->end();jt++){
+				myfile<<(*jt);
+				if(i<l-1)
+					myfile<<" ";
+				i++;
+			}
+			myfile << endl;
 		}
 		myfile.close();
 	}

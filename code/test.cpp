@@ -22,6 +22,7 @@ int main(void){
 	vector<unsigned int> p={2,1};
 	g.order(p);
 	g.saveTo(pathOut);
+	cerr<<"Written to file "+fileName+"_sorted.dat"<<endl;
 	// for(it = g.relation.begin(); it != g.relation.end(); it++){
 	// 	cout << (*it).front()<<" "<<(*it).back() << endl;
 	// }
