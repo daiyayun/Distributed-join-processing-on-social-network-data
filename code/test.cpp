@@ -3,28 +3,28 @@
 #include <iostream>
 #include "Graph.hpp"
 
-//#include "Graph.hpp"
+using namespace std;
+
 int main(void){
-	using namespace std;
-	const string fileName="twitter";
+
+	/*
+	 *creat a new graph from a data file
+	*/ 	
+	const string fileName="facebook";//the name of the file to be read
 	const string path = "../"+fileName+".dat";
 	const string pathOut="../"+fileName+"_sorted.dat";
 	Graph g(path);
 
 	cerr<<"Size: "<<g.getSize()<<endl;
 	cerr<<"Arity: "<<g.getArity()<<endl;
-	// cerr<<"Before sorting: "<<endl;
-	// vector<vector<unsigned int>>::iterator it;
-	// for(it = g.relation.begin(); it != g.relation.end(); it++){
-	// 	cerr << (*it).front() <<" "<<(*it).back()<< endl;
-	// }
-	// cerr<<"After sorting: "<<endl;
-	vector<unsigned int> p={2,1};
+	
+	/*
+	 *order the relation with a given permutation
+	*/ 
+	vector<unsigned int> p={1,2};
 	g.order(p);
 	g.saveTo(pathOut);
-	cerr<<"Written to file "+fileName+"_sorted.dat"<<endl;
-	// for(it = g.relation.begin(); it != g.relation.end(); it++){
-	// 	cout << (*it).front()<<" "<<(*it).back() << endl;
-	// }
 
+	cerr<<"Written to file "+fileName+"_sorted.dat"<<endl;
+	
 }

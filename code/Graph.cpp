@@ -7,6 +7,7 @@
 
 #include "Graph.hpp"
 
+//construct a graph from a data file
 Graph::Graph(string path){
 	using namespace std;
 	string line;
@@ -27,12 +28,13 @@ Graph::Graph(string path){
 	else std::cerr<<"Unable to open file"<<endl;
 }
 
+//order a relation with a given permutation
 void Graph::order(vector<unsigned int> perm){
 	using namespace std;	
-	sort(this->relation.begin(),this->relation.end(),Local(perm));
+	sort(this->relation.begin(),this->relation.end(),Compare(perm));
 }
 
-
+//save the relation to a given path
 void Graph::saveTo(string path){
 	using namespace std;
 	int l=getArity();

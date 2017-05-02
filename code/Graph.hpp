@@ -2,24 +2,25 @@
 #include <vector>
 using namespace std;
 
+//define a classe named Graph to store a relation
 class Graph{
 public:
 	Graph(string path);
 	~Graph();
 
-	vector < vector <unsigned int> > relation;
+	vector<vector<unsigned int>> relation;
 
 	int getSize(){return relation.size();}
 	int getArity(){return relation[0].size();}
 	void order(vector<unsigned int> perm);
 	void saveTo(string path);
 
-
 };
 
-struct Local{
+//define a comparator to order the relation
+struct Compare{
 	vector<unsigned int> perm;
-	Local(vector<unsigned int> perm){this->perm=perm;}
+	Compare(vector<unsigned int> perm){this->perm=perm;}
 
 	bool operator()(vector<unsigned int> l1, vector<unsigned int> l2){
 		int n=perm.size();
