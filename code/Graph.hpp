@@ -14,6 +14,7 @@ public:
 
 	int getSize(){return relation.size();}
 	int getArity(){return relation[0].size();}
+	bool isEmpty(){return relation.empty();}
 	void order(vector<unsigned int> perm);
 	void saveTo(string path);
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);
