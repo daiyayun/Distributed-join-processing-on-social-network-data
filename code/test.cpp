@@ -10,9 +10,10 @@ int main(void){
 	/*
 	 *creat a new graph from a data file
 	*/ 	
-	const string fileName="facebook";//the name of the file to be read
+	const string fileName="test";//the name of the file to be read
 	const string path = "../"+fileName+".dat";
-	const string pathOut="../"+fileName+"_sorted.dat";
+	const string pathSorted="../"+fileName+"_sorted.dat";
+	const string pathJoined="../"+fileName+"_joined.dat";
 	Graph g(path);
 
 	cerr<<"Size: "<<g.getSize()<<endl;
@@ -21,10 +22,21 @@ int main(void){
 	/*
 	 *order the relation with a given permutation
 	*/ 
+
+	cerr<<"testing sort..."<<endl;
 	vector<unsigned int> p={1,2};
 	g.order(p);
-	g.saveTo(pathOut);
+	g.saveTo(pathSorted);
 
 	cerr<<"Written to file "+fileName+"_sorted.dat"<<endl;
+
+	cerr<<"testing join..."<<endl;
+	vector<string> var1={"x1","x2"};
+	vector<string> var2={"x2","x3"};
+	Graph gJoined=Graph::join(g,var1,g,var2);
+	gJoined.saveTo(pathJoined);
+	cerr<<"Written tofile "+fileName+"_joined.dat"<<endl;
+	return 0;
+
 	
 }
