@@ -14,23 +14,13 @@ using namespace std;
 
 int main(int argc, char **argv){
 
-<<<<<<< HEAD
-	
 	//creat a new graph from a data file
-	 	
-	const string fileName="test";//the name of the file to be read
-=======
-	/*
-	 *creat a new graph from a data file
-	*/ 
 	string fileName;
 	if(argc==2){
 		fileName=argv[1]; 
 	} else{
 		fileName="test";//the name of the default file to be read
-	}
-	
->>>>>>> 281ce98070220edc477f387f7881df88958376d4
+	}	
 	const string path = "../"+fileName+".dat";
 	const string pathSorted="../"+fileName+"_sorted.dat";
 	const string pathJoined="../"+fileName+"_joined.dat";
@@ -40,9 +30,7 @@ int main(int argc, char **argv){
 	cerr<<"Size: "<<g.getSize()<<endl;
 	cerr<<"Arity: "<<g.getArity()<<endl;
 	
-	
-	//order the relation with a given permutation 
-
+	//test the order function
 	cerr<<"Testing sort..."<<endl;
 	vector<unsigned int> p={1,2};
 	g.order(p);
@@ -51,6 +39,7 @@ int main(int argc, char **argv){
 
 	cerr<<"Written to "+fileName+"_sorted.dat"<<endl;
 
+	//test the join function
 	cerr<<"Testing join..."<<endl;
 	vector<string> var1={"x1","x2"};
 	vector<string> var2={"x2","x3"};

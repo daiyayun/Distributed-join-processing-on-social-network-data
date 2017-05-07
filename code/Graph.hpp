@@ -22,10 +22,7 @@ public:
 
 	int getSize(){return relation.size();}//get the size of the relation
 	int getArity(){return relation[0].size();}//get the arity of the relation
-<<<<<<< HEAD
-=======
 	bool isEmpty(){return relation.empty();}
->>>>>>> 281ce98070220edc477f387f7881df88958376d4
 	void order(vector<unsigned int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
