@@ -1,3 +1,10 @@
+/*
+ * Graph.cpp
+ *
+ *  Created on: May 1, 2017
+ *		Author: yayundai & zejianli
+*/
+
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -67,6 +74,7 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	for(int i = 0; i < l1; i++) perm1[i] = 0;
 	for(int i = 0; i < l2; i++) perm2[i] = 0;
 
+	//create a permutation array for each relation, and order the two relations
 	int n = x[0].size();//number of common variables
 	for(int i = 0; i < n; i++){
 		perm1[x[0][i]] = (i+1);
@@ -88,12 +96,22 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	}
 	r1.order(perm1);
 	r2.order(perm2);
+
+	// join the two relations:
+	// iterate over the two relations in parallel starting at the first tuple in each
+	// and call the currently considered tuples t and t'. 
+	// If t and t' coincide on X, add all combinations of tuples that agree with t and t' on X,
+	// add the result to the output and jump in R and R' to the first tuples that disagree with t and t 0 on X;
+	// If π(t) and π(t') are different two cases can occur: 
+	//   If π(t) is lexicographically smaller than π(t'), go to the next tuple t;
+	//   Otherwise, go to the next tuple t'.
+
 	vector<vector<unsigned int> >::iterator it1 = r1.relation.begin();
 	vector<vector<unsigned int> >::iterator it2 = r2.relation.begin();
-	Graph g;
+	Graph g;//the joined graph
 	while((it1!=r1.relation.end())&&(it2!=r2.relation.end())){
 		bool flag = customCompare((*it1),(*it2),x);
-		if(flag){
+		if(flag){           //If t and t' coincide on X
 			int pos = 1;
 			while(((it2+pos)!=r2.relation.end())&&customCompare(*it1,*(it2+pos),x)){
 				pos++;
@@ -119,7 +137,7 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 
 			}
 			it2+=pos;
-		} else{
+		} else{           //If π(t) and π(t') are different
 			vector<unsigned int> v1tmp, v2tmp, perm;
 			for(int i=1;i<=n;i++)
 				perm.push_back(i);
@@ -144,6 +162,7 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 Graph::~Graph(){}
 
 //find the common variables in two varaible lists
+
 vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2){
 	int n1=v1.size();
 	int n2=v2.size();
@@ -165,12 +184,13 @@ vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2){
 	return result;
 };
 
+//compare the restrictions of two tuples onto X, the set of common variables 
+
 bool customCompare(vector<unsigned int> v1, vector<unsigned int> v2, vector<vector<unsigned int> > commonPos){
 	int n=commonPos[0].size();
 	for(int i = 0; i < n; i++){
 		if(v1[commonPos[0][i]] != v2[commonPos[1][i]])
 			return false;
-
 	}
 	return true;
 

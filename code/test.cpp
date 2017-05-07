@@ -1,3 +1,10 @@
+/*
+ * test.cpp
+ *
+ *  Created on: May 1, 2017
+ *		Author: yayundai & zejianli
+*/
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -7,9 +14,9 @@ using namespace std;
 
 int main(void){
 
-	/*
-	 *creat a new graph from a data file
-	*/ 	
+	
+	//creat a new graph from a data file
+	 	
 	const string fileName="test";//the name of the file to be read
 	const string path = "../"+fileName+".dat";
 	const string pathSorted="../"+fileName+"_sorted.dat";
@@ -19,9 +26,8 @@ int main(void){
 	cerr<<"Size: "<<g.getSize()<<endl;
 	cerr<<"Arity: "<<g.getArity()<<endl;
 	
-	/*
-	 *order the relation with a given permutation
-	*/ 
+	
+	//order the relation with a given permutation 
 
 	cerr<<"testing sort..."<<endl;
 	vector<unsigned int> p={1,2};
