@@ -15,30 +15,31 @@ using namespace std;
 class Graph{
 public:
 	Graph(string path);//construct a graph from a given data path;
+	Graph(vector<vector<int>> r){this->relation = r;};
 	Graph(){};
 	~Graph();
 
-	vector<vector<unsigned int>> relation;
+	vector<vector<int>> relation;
 
 	int getSize(){return relation.size();}//get the size of the relation
 	int getArity(){return relation[0].size();}//get the arity of the relation
 	bool isEmpty(){return relation.empty();}
-	void order(vector<unsigned int> perm);//order the relation with a given permuation
+	void order(vector<int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
 };
 
 //define a comparator to order the relation
 struct Compare{
-	vector<unsigned int> perm;
-	Compare(vector<unsigned int> perm){this->perm=perm;}
+	vector<int> perm;
+	Compare(vector<int> perm){this->perm=perm;}
 
-	bool operator()(vector<unsigned int> l1, vector<unsigned int> l2){
+	bool operator()(vector<int> l1, vector<int> l2){
 		int n=perm.size();
-		unsigned int prio[n];
-		unsigned int i=0;
+		int prio[n];
+		int i=0;
 		//get the priority orders according to the permutation
-		for(vector<unsigned int>::iterator it=perm.begin();it!=perm.end();it++){
+		for(vector<int>::iterator it=perm.begin();it!=perm.end();it++){
 			prio[(*it)-1]=i;
 			i++;
 		}
@@ -66,7 +67,7 @@ struct Compare{
  * \return two vectors that contain the indexes of the common variables in correspondant list.
 */
 
-vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2);
+vector<vector<int>> findcommon(vector<string> v1, vector<string> v2);
 
 /**
  * \brief compare the restrictions of two tuples onto X, the set of common variables 
@@ -77,4 +78,4 @@ vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2);
  * \return true if v1<v2
 */
 
-bool customCompare(vector<unsigned int> v1, vector<unsigned int> v2, vector<vector<unsigned int> > commonPos);
+bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPos);

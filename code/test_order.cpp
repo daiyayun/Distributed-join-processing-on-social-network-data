@@ -32,7 +32,7 @@ int main(int argc, char **argv){
 	
 	//test the order function
 	cerr<<"Testing sort..."<<endl;
-	vector<unsigned int> p={1,2};
+	vector<int> p={1,2};
 	g.order(p);
 	cerr<<"Sorted."<<endl;
 	g.saveTo(pathSorted);

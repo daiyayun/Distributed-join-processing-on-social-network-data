@@ -24,7 +24,7 @@ Graph::Graph(string path){
 			//write data into the class
 			istringstream iss(line);
 			string s;
-			vector<unsigned int> tuple;
+			vector<int> tuple;
 			while(getline(iss, s, ' ')){
 				tuple.push_back(stoi(s));
 			}
@@ -36,7 +36,7 @@ Graph::Graph(string path){
 }
 
 //order a relation with a given permutation
-void Graph::order(vector<unsigned int> perm){
+void Graph::order(vector<int> perm){
 	using namespace std;	
 	sort(this->relation.begin(),this->relation.end(),Compare(perm));
 }
@@ -47,10 +47,10 @@ void Graph::saveTo(string path){
 	int l=getArity();
 	ofstream myfile(path.c_str());
 	if(myfile.is_open()){
-		vector<vector<unsigned int>>::iterator it;
+		vector<vector<int>>::iterator it;
 		for(it = relation.begin(); it != relation.end(); it++){
 			int i=0;
-			for(vector<unsigned int>::iterator jt=it->begin();jt!=it->end();jt++){
+			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
 				myfile<<(*jt);
 				if(i<l-1)
 					myfile<<" ";
@@ -66,11 +66,11 @@ void Graph::saveTo(string path){
 //join two relations
 Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	using namespace std;
-	vector<vector<unsigned int> > x = findcommon(v1, v2);
+	vector<vector<int> > x = findcommon(v1, v2);
 	int l1 = v1.size();//number of variables in graph r1
 	int l2 = v2.size();//number of variables in graph r2
-	vector<unsigned int> perm1(l1);
-	vector<unsigned int> perm2(l2);
+	vector<int> perm1(l1);
+	vector<int> perm2(l2);
 	for(int i = 0; i < l1; i++) perm1[i] = 0;
 	for(int i = 0; i < l2; i++) perm2[i] = 0;
 
@@ -106,8 +106,8 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	//   If π(t) is lexicographically smaller than π(t'), go to the next tuple t;
 	//   Otherwise, go to the next tuple t'.
 
-	vector<vector<unsigned int> >::iterator it1 = r1.relation.begin();
-	vector<vector<unsigned int> >::iterator it2 = r2.relation.begin();
+	vector<vector<int> >::iterator it1 = r1.relation.begin();
+	vector<vector<int> >::iterator it2 = r2.relation.begin();
 	Graph g;//the joined graph
 	while((it1!=r1.relation.end())&&(it2!=r2.relation.end())){
 		bool flag = customCompare((*it1),(*it2),x);
@@ -119,12 +119,12 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 
 			while((it1!=r1.relation.end())&&(it2!=r2.relation.end())&&customCompare(*it1,*it2,x)){
 				for(int i = 0; i < pos; i++){
-					vector<unsigned int> v;
+					vector<int> v;
 					for(int j = 0; j < l1; j++){
 						v.push_back((*it1)[j]);
 					}
 
-					for(unsigned int j = 0; j < l2; j++){
+					for(int j = 0; j < l2; j++){
 						// if(!contains(x[1],j)){
 						if(find(x[1].begin(),x[1].end(),j)==x[1].end()){
 							v.push_back((*(it2+i))[j]);
@@ -138,7 +138,7 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 			}
 			it2+=pos;
 		} else{           //If π(t) and π(t') are different
-			vector<unsigned int> v1tmp, v2tmp, perm;
+			vector<int> v1tmp, v2tmp, perm;
 			for(int i=1;i<=n;i++)
 				perm.push_back(i);
 			for(int i=0;i<n;i++){
@@ -163,12 +163,12 @@ Graph::~Graph(){}
 
 //find the common variables in two varaible lists
 
-vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2){
+vector<vector<int>> findcommon(vector<string> v1, vector<string> v2){
 	int n1=v1.size();
 	int n2=v2.size();
 	string s1,s2;
-	vector<vector<unsigned int> > result;
-	vector<unsigned int> pos1,pos2;
+	vector<vector<int> > result;
+	vector<int> pos1,pos2;
 	for(int i=0;i<n1;i++){
 		s1=v1[i];
 		for(int j=0;j<n2;j++){
@@ -186,7 +186,7 @@ vector<vector<unsigned int>> findcommon(vector<string> v1, vector<string> v2){
 
 //compare the restrictions of two tuples onto X, the set of common variables 
 
-bool customCompare(vector<unsigned int> v1, vector<unsigned int> v2, vector<vector<unsigned int> > commonPos){
+bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPos){
 	int n=commonPos[0].size();
 	for(int i = 0; i < n; i++){
 		if(v1[commonPos[0][i]] != v2[commonPos[1][i]])
