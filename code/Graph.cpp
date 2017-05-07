@@ -124,7 +124,7 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 						v.push_back((*it1)[j]);
 					}
 
-					for(unsigned int j = 0; j< l2; j++){
+					for(unsigned int j = 0; j < l2; j++){
 						// if(!contains(x[1],j)){
 						if(find(x[1].begin(),x[1].end(),j)==x[1].end()){
 							v.push_back((*(it2+i))[j]);
