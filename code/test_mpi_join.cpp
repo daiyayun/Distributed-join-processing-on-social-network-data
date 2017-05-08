@@ -20,7 +20,8 @@ int main(int argc, char **argv){
 		fileName1=argv[1]; 
 		fileName2=argv[2];
 	} else{
-		fileName1="test";//the name of the default file to be read
+		//the names of the default files to be read
+		fileName1="test";
 		fileName2="test1";
 	}	
 	cerr<<"Testing join..."<<endl;
@@ -34,21 +35,22 @@ int main(int argc, char **argv){
 	vector<vector<int> > r2=g2.relation;
 	vector<string> var1={"x1","x2"};
 	vector<string> var2={"x2","x3"};
-	vector<vector<int> > x = findcommon(var1, var2);//arity of joined relation
-	int arityJoined=unionSize(var1,var2);
+	vector<vector<int> > x = findcommon(var1, var2);
+	int arityJoined=unionSize(var1,var2);//arity of joined relation
 	int numtasks, taskid;
 	int ilocal;
 	Graph gJoinedLocal,gJoined;
-	vector<int> unfoldedLocal;
+	vector<int> unfoldedLocal;	//local join result unfolded in 1D
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 	vector<vector<vector<int> > > buf[numtasks];
 	int lengths[numtasks];//length of each local join result
-	int displs[numtasks];
-	vector<int> gatheredRaw;
-	vector<vector<int> > gathered;
+	int displs[numtasks];// displacement of each local join result w.r.t. address of receive buffer
+	vector<int> gatheredRaw; //gathered join result in 1D
+	vector<vector<int> > gathered; //gathered join result reconstructed in 2D
 
+	//assigning the task for each process
 	for(int i=0;i<numtasks;i++){
 		vector<vector<int> > tmp1,tmp2;
 		buf[i].push_back(tmp1);
@@ -70,9 +72,8 @@ int main(int argc, char **argv){
 
 	MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
 	gJoinedLocal = Graph::join(Graph(buf[ilocal][0]),var1,Graph(buf[ilocal][1]),var2);
-	//cerr<<glocal.getSize()<<" "<<glocal.getArity()<<endl;
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
-	//gather lengths into root process
+	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
 	if(taskid==0){
 		int	length=0;
@@ -91,6 +92,7 @@ int main(int argc, char **argv){
 
 	}
 	unfoldedLocal=unfold(gJoinedLocal.relation);
+	//when there is nothing to send, send a null pointer.
 	if(unfoldedLocal.size()==0){
 		 MPI_Gatherv(NULL,0,MPI_INT,&gatheredRaw[0],lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}else{
@@ -99,7 +101,7 @@ int main(int argc, char **argv){
 	if(taskid==0){
 		cerr<<"Join done."<<endl;
 		gathered=fold(gatheredRaw,arityJoined);
-		cerr<<"data wrapped."<<endl;
+		cerr<<"data folded."<<endl;
 		//gJoined=Graph(gathered);
 		if(gathered.size()!=0){
 			Graph::saveRelation(gathered,pathJoined);

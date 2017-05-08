@@ -84,7 +84,24 @@ vector<vector<int> > findcommon(vector<string> v1, vector<string> v2);
 */
 
 bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPos);
+/**
+ * \brief compute the size of union of two vectors of string, i.e. the number of different elements
+ * \param v1 the first vector
+ * \param v2 the second vector
+*/
+
 int unionSize(vector<string> v1, vector<string> v2);
 
-vector<int> unfold(vector<vector<int> > mat);
+/**
+* \brief reconstruct a 2D vector from a 1D vector
+* \param unfolded an 1D vector
+* \param blockSize the length of each line
+*/
+
 vector<vector<int> > fold(vector<int> unfolded, int blockSize);
+/**
+* \brief unfold a 2D vector into an 1D vector by laying out the original vector line by line.
+* \param mat the 2D vector to by unfolded
+*/
+
+vector<int> unfold(vector<vector<int> > mat);
