@@ -15,8 +15,8 @@ using namespace std;
 class Graph{
 public:
 	Graph(string path);//construct a graph from a given data path;
-	Graph(vector<vector<int> > r){this->relation = r;};
-	Graph(){};
+	Graph(vector<vector<int> >& r){this->relation = r;};
+	Graph(){this->relation=vector<vector<int> >();};
 	~Graph();
 
 	vector<vector<int> > relation;

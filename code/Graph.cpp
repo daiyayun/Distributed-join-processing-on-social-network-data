@@ -62,6 +62,7 @@ void Graph::saveTo(string path){
 	}
 	else cerr<<"Unable to open file";
 }
+
 void Graph::saveRelation(vector<vector<int> > r, string path){
 	using namespace std;
 	int l=r[0].size();

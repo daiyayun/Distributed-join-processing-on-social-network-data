@@ -24,8 +24,8 @@ int main(int argc, char **argv){
 		fileName1="test";
 		fileName2="test1";
 	}	
-	cerr<<"Testing join..."<<endl;
-	cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;
+
+
 	const string path1 = "../"+fileName1+".dat";
 	const string path2 = "../"+fileName2+".dat";
 	const string pathJoined="../"+fileName1+"_" +fileName2+"_dist_joined.dat";
@@ -44,6 +44,10 @@ int main(int argc, char **argv){
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+	if(taskid==0){
+		cerr<<"Testing join..."<<endl;
+		cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;		
+	}
 	vector<vector<vector<int> > > buf[numtasks];
 	int lengths[numtasks];//length of each local join result
 	int displs[numtasks];// displacement of each local join result w.r.t. address of receive buffer
@@ -102,9 +106,11 @@ int main(int argc, char **argv){
 		cerr<<"Join done."<<endl;
 		gathered=fold(gatheredRaw,arityJoined);
 		cerr<<"data folded."<<endl;
-		//gJoined=Graph(gathered);
+		gJoined=Graph(gathered);
+		cerr<<"new Graph object created."<<endl;
 		if(gathered.size()!=0){
-			Graph::saveRelation(gathered,pathJoined);
+			//Graph::saveRelation(gathered,pathJoined);
+			gJoined.saveTo(pathJoined);
 			cerr<<"Written to "+pathJoined<<endl;		
 		}else{
 			cerr<<"Empty graph, nothing to save !"<<endl;
