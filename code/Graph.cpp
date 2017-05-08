@@ -47,7 +47,7 @@ void Graph::saveTo(string path){
 	int l=getArity();
 	ofstream myfile(path.c_str());
 	if(myfile.is_open()){
-		vector<vector<int>>::iterator it;
+		vector<vector<int> >::iterator it;
 		for(it = relation.begin(); it != relation.end(); it++){
 			int i=0;
 			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
@@ -62,6 +62,27 @@ void Graph::saveTo(string path){
 	}
 	else cerr<<"Unable to open file";
 }
+void Graph::saveRelation(vector<vector<int> > r, string path){
+	using namespace std;
+	int l=r[0].size();
+	ofstream myfile(path.c_str());
+	if(myfile.is_open()){
+		vector<vector<int> >::iterator it;
+		for(it = r.begin(); it != r.end(); it++){
+			int i=0;
+			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
+				myfile<<(*jt);
+				if(i<l-1)
+					myfile<<" ";
+				i++;
+			}
+			myfile << endl;
+		}
+		myfile.close();
+	}
+	else cerr<<"Unable to open file";
+}
+
 
 //join two relations
 Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
@@ -163,7 +184,7 @@ Graph::~Graph(){}
 
 //find the common variables in two varaible lists
 
-vector<vector<int>> findcommon(vector<string> v1, vector<string> v2){
+vector<vector<int> > findcommon(vector<string> v1, vector<string> v2){
 	int n1=v1.size();
 	int n2=v2.size();
 	string s1,s2;
@@ -183,6 +204,11 @@ vector<vector<int>> findcommon(vector<string> v1, vector<string> v2){
 	result.push_back(pos2);
 	return result;
 };
+//find the number of different elements in total
+int unionSize(vector<string> v1, vector<string> v2){
+	return v1.size()+v2.size()-findcommon(v1,v2)[0].size();
+}
+
 
 //compare the restrictions of two tuples onto X, the set of common variables 
 
@@ -197,3 +223,30 @@ bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPo
 };
 
 
+vector<int> unfold(vector<vector<int> > mat){
+	int n=mat.size();
+	if(n==0)
+		return vector<int>(0);
+	int m=mat[0].size();
+	vector<int> res(n*m);
+	for(int i=0;i<n;i++){
+		for(int j=0;j<m;j++){
+			res[i*m+j]=mat[i][j];
+		}
+	}
+	return res;
+}
+
+vector<vector<int> > fold(vector<int> unfolded, int blockSize){
+	int size=unfolded.size()/blockSize;
+	vector<vector<int> > res;
+	for(int i=0;i<size;i++){
+		vector<int> line;
+		for(int j=0;j<blockSize;j++){
+			line.push_back(unfolded[i*blockSize+j]);
+		}
+		res.push_back(line);
+	}
+	return res;
+
+}

@@ -15,18 +15,23 @@ using namespace std;
 class Graph{
 public:
 	Graph(string path);//construct a graph from a given data path;
-	Graph(vector<vector<int>> r){this->relation = r;};
+	Graph(vector<vector<int> > r){this->relation = r;};
 	Graph(){};
 	~Graph();
 
-	vector<vector<int>> relation;
+	vector<vector<int> > relation;
 
 	int getSize(){return relation.size();}//get the size of the relation
-	int getArity(){return relation[0].size();}//get the arity of the relation
+	int getArity(){
+		if(relation.size()==0)
+			return 0;
+		return relation[0].size();
+	}//get the arity of the relation
 	bool isEmpty(){return relation.empty();}
 	void order(vector<int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
+	static void saveRelation(vector<vector<int> > r, string path);
 };
 
 //define a comparator to order the relation
@@ -67,7 +72,7 @@ struct Compare{
  * \return two vectors that contain the indexes of the common variables in correspondant list.
 */
 
-vector<vector<int>> findcommon(vector<string> v1, vector<string> v2);
+vector<vector<int> > findcommon(vector<string> v1, vector<string> v2);
 
 /**
  * \brief compare the restrictions of two tuples onto X, the set of common variables 
@@ -79,3 +84,7 @@ vector<vector<int>> findcommon(vector<string> v1, vector<string> v2);
 */
 
 bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPos);
+int unionSize(vector<string> v1, vector<string> v2);
+
+vector<int> unfold(vector<vector<int> > mat);
+vector<vector<int> > fold(vector<int> unfolded, int blockSize);
