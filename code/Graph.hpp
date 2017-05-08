@@ -31,15 +31,15 @@ public:
 	void order(vector<int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
-	static void saveRelation(vector<vector<int> > r, string path);
+	static void saveRelation(vector<vector<int> >& r, string& path);
 };
 
 //define a comparator to order the relation
 struct Compare{
 	vector<int> perm;
-	Compare(vector<int> perm){this->perm=perm;}
+	Compare(vector<int>& perm){this->perm=perm;}
 
-	bool operator()(vector<int> l1, vector<int> l2){
+	bool operator()(vector<int>& l1, vector<int>& l2){
 		int n=perm.size();
 		int prio[n];
 		int i=0;
@@ -72,7 +72,7 @@ struct Compare{
  * \return two vectors that contain the indexes of the common variables in correspondant list.
 */
 
-vector<vector<int> > findcommon(vector<string> v1, vector<string> v2);
+vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2);
 
 /**
  * \brief compare the restrictions of two tuples onto X, the set of common variables 
@@ -98,10 +98,10 @@ int unionSize(vector<string> v1, vector<string> v2);
 * \param blockSize the length of each line
 */
 
-vector<vector<int> > fold(vector<int> unfolded, int blockSize);
+vector<vector<int> > fold(vector<int>& unfolded, int& blockSize);
 /**
 * \brief unfold a 2D vector into an 1D vector by laying out the original vector line by line.
 * \param mat the 2D vector to by unfolded
 */
 
-vector<int> unfold(vector<vector<int> > mat);
+vector<int> unfold(vector<vector<int> >& mat);

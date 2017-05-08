@@ -63,7 +63,7 @@ void Graph::saveTo(string path){
 	else cerr<<"Unable to open file";
 }
 
-void Graph::saveRelation(vector<vector<int> > r, string path){
+void Graph::saveRelation(vector<vector<int> >& r, string& path){
 	using namespace std;
 	int l=r[0].size();
 	ofstream myfile(path.c_str());
@@ -185,7 +185,7 @@ Graph::~Graph(){}
 
 //find the common variables in two varaible lists
 
-vector<vector<int> > findcommon(vector<string> v1, vector<string> v2){
+vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2){
 	int n1=v1.size();
 	int n2=v2.size();
 	string s1,s2;
@@ -224,7 +224,7 @@ bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPo
 };
 
 
-vector<int> unfold(vector<vector<int> > mat){
+vector<int> unfold(vector<vector<int> >& mat){
 	int n=mat.size();
 	if(n==0)
 		return vector<int>(0);
@@ -238,7 +238,7 @@ vector<int> unfold(vector<vector<int> > mat){
 	return res;
 }
 
-vector<vector<int> > fold(vector<int> unfolded, int blockSize){
+vector<vector<int> > fold(vector<int>& unfolded, int& blockSize){
 	int size=unfolded.size()/blockSize;
 	vector<vector<int> > res;
 	for(int i=0;i<size;i++){
