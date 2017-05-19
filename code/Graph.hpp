@@ -9,6 +9,8 @@
 #include <vector>
 #include <algorithm>
 
+
+
 using namespace std;
 
 //define a classe named Graph to store a relation and related methods
@@ -31,6 +33,7 @@ public:
 	void order(vector<int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
+	static Graph mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2);//join two reltions using mpi
 	static void saveRelation(vector<vector<int> >& r, string& path);
 };
 

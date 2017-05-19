@@ -12,6 +12,7 @@
 #include <vector>
 #include <algorithm>
 
+
 #include "Graph.hpp"
 
 //construct a graph from a data file
@@ -249,5 +250,5 @@ vector<vector<int> > fold(vector<int>& unfolded, int& blockSize){
 		res.push_back(line);
 	}
 	return res;
-
 }
+
