@@ -20,7 +20,7 @@ Graph Graph::mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 	vector<vector<int> > x = findcommon(var1, var2);
 	int arityJoined=unionSize(var1,var2);//arity of joined relation	
 
-	int ilocal;	
+	//int ilocal;	
 	Graph gJoinedLocal,gJoined;
 	vector<int> unfoldedLocal;	//local join result unfolded in 1D
 	vector<vector<vector<int> > > buf[numtasks];
@@ -46,11 +46,11 @@ Graph Graph::mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 	for(it2=r2.begin(); it2!=r2.end(); it2++){
 		buf[(*it2)[x[1][0]]%numtasks][1].push_back(*it2);
 	}
-	int msg[numtasks];
-	for(int i=0; i<numtasks; i++) msg[i] = i;
+	//int msg[numtasks];
+	//for(int i=0; i<numtasks; i++) msg[i] = i;
 
-	MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
-	gJoinedLocal = Graph::join(Graph(buf[ilocal][0]),var1,Graph(buf[ilocal][1]),var2);
+	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
+	gJoinedLocal = Graph::join(Graph(buf[taskid][0]),var1,Graph(buf[taskid][1]),var2);
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);

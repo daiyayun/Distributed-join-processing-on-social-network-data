@@ -38,14 +38,14 @@ int main(int argc, char **argv){
 	vector<vector<int> > x = findcommon(var1, var2);
 	int arityJoined=unionSize(var1,var2);//arity of joined relation
 	int numtasks, taskid;
-	int ilocal;
+	//int ilocal;
 	Graph gJoinedLocal,gJoined;
 	vector<int> unfoldedLocal;	//local join result unfolded in 1D
 	MPI_Init(&argc, &argv);
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 	if(taskid==0){
-		cerr<<"Testing join..."<<endl;
+		cerr<<"Testing join on "<<numtasks<<" processes."<<endl;
 		cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;		
 	}
 	vector<vector<vector<int> > > buf[numtasks];
@@ -71,11 +71,11 @@ int main(int argc, char **argv){
 	for(it2=r2.begin(); it2!=r2.end(); it2++){
 		buf[(*it2)[x[1][0]]%numtasks][1].push_back(*it2);
 	}
-	int msg[numtasks];
-	for(int i=0; i<numtasks; i++) msg[i] = i;
+	//int msg[numtasks];
+	//for(int i=0; i<numtasks; i++) msg[i] = i;
 
-	MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
-	gJoinedLocal = Graph::join(Graph(buf[ilocal][0]),var1,Graph(buf[ilocal][1]),var2);
+	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
+	gJoinedLocal = Graph::join(Graph(buf[taskid][0]),var1,Graph(buf[taskid][1]),var2);
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);

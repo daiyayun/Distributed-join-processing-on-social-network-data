@@ -41,7 +41,7 @@ int main(int argc, char **argv){
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
 	if(taskid==0){
-		cerr<<"Testing join on "<<numtasks<<"processes..."<<endl;
+		cerr<<"Testing join on "<<numtasks<<" processes..."<<endl;
 		cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;		
 	}
 
