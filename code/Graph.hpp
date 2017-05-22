@@ -33,8 +33,10 @@ public:
 	void order(vector<int> perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
-	static Graph mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2);//join two reltions using mpi
+	static Graph MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2);//join two reltions using mpi
+	static Graph multiMPIJoin(Graph[] g, vector<string>[] v, int n);
 	static void saveRelation(vector<vector<int> >& r, string& path);
+	static uint32_t hash(uint32_t a);
 };
 
 //define a comparator to order the relation
@@ -78,6 +80,12 @@ struct Compare{
 vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2);
 
 /**
+ * \brief calculate the list of variables of the joined relation
+ */
+
+vector<vector<string> > joinedvar(vector<string>& v1, vector<string>& v2) ;
+
+/**
  * \brief compare the restrictions of two tuples onto X, the set of common variables 
  * \param v1 the first tuple
  * \param v2 the second tuple
@@ -87,6 +95,7 @@ vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2);
 */
 
 bool customCompare(vector<int> v1, vector<int> v2, vector<vector<int> > commonPos);
+
 /**
  * \brief compute the size of union of two vectors of string, i.e. the number of different elements
  * \param v1 the first vector
@@ -102,6 +111,7 @@ int unionSize(vector<string> v1, vector<string> v2);
 */
 
 vector<vector<int> > fold(vector<int>& unfolded, int& blockSize);
+
 /**
 * \brief unfold a 2D vector into an 1D vector by laying out the original vector line by line.
 * \param mat the 2D vector to by unfolded

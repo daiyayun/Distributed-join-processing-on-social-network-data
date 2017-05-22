@@ -206,11 +206,15 @@ vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2){
 	result.push_back(pos2);
 	return result;
 };
+
 //find the number of different elements in total
 int unionSize(vector<string> v1, vector<string> v2){
 	return v1.size()+v2.size()-findcommon(v1,v2)[0].size();
 }
 
+vector<vector<string> > joinedvar(vector<string>& v1, vector<string>& v2){
+	
+}
 
 //compare the restrictions of two tuples onto X, the set of common variables 
 
@@ -252,3 +256,13 @@ vector<vector<int> > fold(vector<int>& unfolded, int& blockSize){
 	return res;
 }
 
+uint32_t Graph::hash(uint32_t a)
+{
+   a = (a+0x7ed55d16) + (a<<12);
+   a = (a^0xc761c23c) ^ (a>>19);
+   a = (a+0x165667b1) + (a<<5);
+   a = (a+0xd3a2646c) ^ (a<<9);
+   a = (a+0xfd7046c5) + (a<<3);
+   a = (a^0xb55a4f09) ^ (a>>16);
+   return a;
+}

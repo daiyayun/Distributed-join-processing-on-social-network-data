@@ -10,7 +10,7 @@
 
 #include "mpi.h"
 
-Graph Graph::mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
+Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
 	int taskid,numtasks;
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
@@ -81,6 +81,28 @@ Graph Graph::mpiJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 		gathered=fold(gatheredRaw,arityJoined);
 		gJoined=Graph(gathered);
 		return gJoined;
+	}
+
+}
+
+Graph Graph::multiMPIJoin(Graph[] g, vector<string>[] v, int n){
+	int taskid,numtasks;
+	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
+	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
+
+	vector<vector<int> > r1, r2;
+	vector<string> var1 = v[0];
+	vector<string> var2 = v[1];
+	vector<vector<int> > x = findcommon(var1, var2);
+	vector<vector<int> >::iterator it1;
+
+	for(it1 = g[0].relation.begin(); it1 != g[0].relation.end(); it1++){
+		if(hash((*it1)[x[0][0]])==taskid)
+			r1.push_back(*it1);
+	}
+
+	for(int i=1; i<n; i++){
+
 	}
 
 }
