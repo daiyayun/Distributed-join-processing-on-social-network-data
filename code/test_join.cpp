@@ -33,8 +33,11 @@ int main(int argc, char **argv){
 	//test the join function
 	cerr<<"Testing join..."<<endl;
 	cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;
-	vector<string> var1={"x1","x2"};
-	vector<string> var2={"x2","x3"};
+	vector<string> var1;
+	var1.push_back("x1");var1.push_back("x2");
+	vector<string> var2;
+	var2.push_back("x2");var2.push_back("x3");
+
 	
 	Graph gJoined=Graph::join(g1,var1,g2,var2);
 	cerr<<"Join done."<<endl;

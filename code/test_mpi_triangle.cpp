@@ -28,10 +28,15 @@ int main(int argc, char **argv){
 	const string pathInterm = "../"+fileName+"_interm.dat";
 	const string pathJoined="../"+fileName+"_dist_triangles.dat";
 	Graph g(path);
-	vector<string> var1={"x1","x2"};
-	vector<string> var2={"x2","x3"};
-	vector<string> var3={"x1","x2","x3"};
-	vector<string> var4={"x1","x3"};
+	vector<string> var1;
+	var1.push_back("x1");var1.push_back("x2");
+	vector<string> var2;
+	var2.push_back("x2");var2.push_back("x3");
+	vector<string> var3;
+	var3=joinedVar(var1,var2);
+	vector<string> var4;
+	//var3.push_back("x1");var3.push_back("x2");var3.push_back("x3");
+	var4.push_back("x1");var4.push_back("x3");
 	int arityJoined=unionSize(var1,var2);//arity of joined relation	
 
 
@@ -46,7 +51,7 @@ int main(int argc, char **argv){
 	}
 
 	Graph gJoined,gJoined1;
-	gJoined=Graph::mpiJoin(g,var1,g,var2);
+	gJoined=Graph::MPIJoin(g,var1,g,var2);
 //	cerr<<"first result is empty: "<<gJoined.isEmpty()<<endl;
 	vector<int> gJoinedUnfolded;
 	int unfoldedLength;
@@ -61,28 +66,28 @@ int main(int argc, char **argv){
 			firstJoinEmpty=0;
 			gJoinedUnfolded=unfold(gJoined.relation);
 			unfoldedLength=gJoinedUnfolded.size();
-			gJoined.saveTo(pathInterm);
-			cerr<<"Written to "+pathInterm<<endl;		
+		//	gJoined.saveTo(pathInterm);
+		//	cerr<<"Written to "+pathInterm<<endl;		
 		}else{
 			cerr<<"Empty graph, nothing to save !"<<endl;
 		}
 	}
+	//if first join has empty result, stop the program.
 	MPI_Bcast(&firstJoinEmpty,1,MPI_INT,0,MPI_COMM_WORLD);
 	if(firstJoinEmpty){
 		MPI_Finalize();
 		return 0;
 	}
+	//broadcast the result of first join to all the processes
 	MPI_Bcast(&unfoldedLength,1,MPI_INT,0,MPI_COMM_WORLD);
-
 	if(taskid!=0){
 		gJoinedUnfolded=vector<int>(unfoldedLength);
 	}
-
 	MPI_Bcast(&gJoinedUnfolded[0],unfoldedLength,MPI_INT,0,MPI_COMM_WORLD);
-
+	
 	gJoinedRefolded=fold(gJoinedUnfolded,arityJoined);
 	gJoined.relation=gJoinedRefolded;
-	gJoined1=Graph::mpiJoin(gJoined,var3,g,var4);
+	gJoined1=Graph::MPIJoin(gJoined,var3,g,var4);
 
 
 	if(taskid==0){

@@ -27,7 +27,8 @@ Graph::Graph(string path){
 			string s;
 			vector<int> tuple;
 			while(getline(iss, s, ' ')){
-				tuple.push_back(stoi(s));
+				//tuple.push_back(stoi(s));
+				tuple.push_back(atoi(s.c_str()));
 			}
 			relation.push_back(tuple);
 		}
@@ -89,7 +90,7 @@ void Graph::saveRelation(vector<vector<int> >& r, string& path){
 //join two relations
 Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	using namespace std;
-	vector<vector<int> > x = findcommon(v1, v2);
+	vector<vector<int> > x = findCommon(v1, v2);
 	int l1 = v1.size();//number of variables in graph r1
 	int l2 = v2.size();//number of variables in graph r2
 	vector<int> perm1(l1);
@@ -186,7 +187,7 @@ Graph::~Graph(){}
 
 //find the common variables in two varaible lists
 
-vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2){
+vector<vector<int> > findCommon(vector<string>& v1, vector<string>& v2){
 	int n1=v1.size();
 	int n2=v2.size();
 	string s1,s2;
@@ -209,11 +210,33 @@ vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2){
 
 //find the number of different elements in total
 int unionSize(vector<string> v1, vector<string> v2){
-	return v1.size()+v2.size()-findcommon(v1,v2)[0].size();
+	return joinedVar(v1,v2).size();
 }
 
-vector<vector<string> > joinedvar(vector<string>& v1, vector<string>& v2){
-	
+vector<string> joinedVar(vector<string>& v1, vector<string>& v2){
+	vector<string> result;
+	int n1=v1.size();
+	int n2=v2.size();
+	string s1,s2;
+	bool contains;
+	for(int i=0;i<n1;i++){
+		result.push_back(v1[i]);
+	}
+	for(int i=0;i<n2;i++){
+		s2=v2[i];
+		contains=false;
+		for(int j=0;j<n1;j++){
+			s1=v1[j];
+			if(s1.compare(s2)==0){
+				contains=true;
+				break;
+			}
+		}
+		if(!contains){
+			result.push_back(s2);
+		}
+	}
+	return result;
 }
 
 //compare the restrictions of two tuples onto X, the set of common variables 

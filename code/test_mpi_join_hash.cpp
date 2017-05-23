@@ -32,8 +32,10 @@ int main(int argc, char **argv){
 	const string pathJoined="../"+fileName1+"_" +fileName2+"_dist_joined.dat";
 	Graph g1(path1);
 	Graph g2(path2);
-	vector<string> var1={"x1","x2"};
-	vector<string> var2={"x2","x3"};
+	vector<string> var1;
+	var1.push_back("x1");var1.push_back("x2");
+	vector<string> var2;
+	var2.push_back("x2");var2.push_back("x3");
 
 	MPI_Init(&argc, &argv);
 	int numtasks, taskid;
@@ -45,7 +47,7 @@ int main(int argc, char **argv){
 		cerr<<"joining "<< fileName1 << " and "<< fileName2 << endl;		
 	}
 
-	Graph gJoined=Graph::mpiJoin(g1,var1,g2,var2);
+	Graph gJoined=Graph::mpiJoinHash(g1,var1,g2,var2);
 
 	if(taskid==0){
 		cerr<<"Join done."<<endl;

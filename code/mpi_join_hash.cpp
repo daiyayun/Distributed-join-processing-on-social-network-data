@@ -10,14 +10,14 @@
 
 #include "mpi.h"
 
-Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
+Graph Graph::mpiJoinHash(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
 	int taskid,numtasks;
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
 	vector<vector<int> > r1=g1.relation;
 	vector<vector<int> > r2=g2.relation;
-	vector<vector<int> > x = findCommon(var1, var2);
+	vector<vector<int> > x = findcommon(var1, var2);
 	int arityJoined=unionSize(var1,var2);//arity of joined relation	
 
 	//int ilocal;	
@@ -40,11 +40,11 @@ Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 	vector<vector<int> >::iterator it2;
 
 	for(it1=r1.begin(); it1!=r1.end(); it1++){
-		buf[((*it1)[x[0][0]])%numtasks][0].push_back(*it1);
+		buf[Graph::hash((*it1)[x[0][0]])%numtasks][0].push_back(*it1);
 	}
 
 	for(it2=r2.begin(); it2!=r2.end(); it2++){
-		buf[(*it2)[x[1][0]]%numtasks][1].push_back(*it2);
+		buf[Graph::hash((*it2)[x[1][0]])%numtasks][1].push_back(*it2);
 	}
 	//int msg[numtasks];
 	//for(int i=0; i<numtasks; i++) msg[i] = i;
@@ -81,29 +81,6 @@ Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 		gathered=fold(gatheredRaw,arityJoined);
 		gJoined=Graph(gathered);
 		return gJoined;
-	}
-
-}
-
-
-Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
-	int taskid,numtasks;
-	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
-	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
-
-	vector<vector<int> > r1, r2;
-	vector<string> var1 = v[0];
-	vector<string> var2 = v[1];
-	vector<vector<int> > x = findCommon(var1, var2);
-	vector<vector<int> >::iterator it1;
-
-	for(it1 = g[0].relation.begin(); it1 != g[0].relation.end(); it1++){
-		if(hash((*it1)[x[0][0]])==taskid)
-			r1.push_back(*it1);
-	}
-
-	for(int i=1; i<n; i++){
-
 	}
 
 }

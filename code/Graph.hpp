@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <stdint.h>
 
 
 
@@ -34,7 +35,7 @@ public:
 	void saveTo(string path);//save the relation to a fiven file path
 	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
 	static Graph MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2);//join two reltions using mpi
-	static Graph multiMPIJoin(Graph[] g, vector<string>[] v, int n);
+	static Graph multiMPIJoin(Graph* g, vector<string>* v, int n);
 	static void saveRelation(vector<vector<int> >& r, string& path);
 	static uint32_t hash(uint32_t a);
 };
@@ -44,7 +45,7 @@ struct Compare{
 	vector<int> perm;
 	Compare(vector<int>& perm){this->perm=perm;}
 
-	bool operator()(vector<int>& l1, vector<int>& l2){
+	bool operator()(const vector<int>& l1,const vector<int>& l2){
 		int n=perm.size();
 		int prio[n];
 		int i=0;
@@ -77,13 +78,13 @@ struct Compare{
  * \return two vectors that contain the indexes of the common variables in correspondant list.
 */
 
-vector<vector<int> > findcommon(vector<string>& v1, vector<string>& v2);
+vector<vector<int> > findCommon(vector<string>& v1, vector<string>& v2);
 
 /**
  * \brief calculate the list of variables of the joined relation
  */
 
-vector<vector<string> > joinedvar(vector<string>& v1, vector<string>& v2) ;
+vector<string> joinedVar(vector<string>& v1, vector<string>& v2) ;
 
 /**
  * \brief compare the restrictions of two tuples onto X, the set of common variables 
