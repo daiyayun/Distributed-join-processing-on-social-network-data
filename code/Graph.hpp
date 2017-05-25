@@ -111,7 +111,7 @@ int unionSize(vector<string> v1, vector<string> v2);
 * \param blockSize the length of each line
 */
 
-vector<vector<int> > fold(vector<int>& unfolded, int& blockSize);
+vector<vector<int> > fold(vector<int>& unfolded, const int& blockSize);
 
 /**
 * \brief unfold a 2D vector into an 1D vector by laying out the original vector line by line.

@@ -266,7 +266,7 @@ vector<int> unfold(vector<vector<int> >& mat){
 	return res;
 }
 
-vector<vector<int> > fold(vector<int>& unfolded, int& blockSize){
+vector<vector<int> > fold(vector<int>& unfolded, const int& blockSize){
 	int size=unfolded.size()/blockSize;
 	vector<vector<int> > res;
 	for(int i=0;i<size;i++){
