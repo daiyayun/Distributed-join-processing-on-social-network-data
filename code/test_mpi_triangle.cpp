@@ -1,7 +1,7 @@
 /*
  * MPI_join.cpp
  *
- *  Created on: May 7, 2017
+ *  Created on: May 17, 2017
  *		Author: yayundai & zejianli
 */
 
