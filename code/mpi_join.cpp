@@ -203,25 +203,7 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 		// cerr<<"r1 size on rank "<<taskid<<":::::::::::::::::::::::"<<r1.size()<<endl;
 
 		// cerr<<"r2 size on rank "<<taskid<<":::::::::::::::::::::::"<<r2.size()<<endl;
-		if(i==2 && taskid==1){
-		cerr<<"on task "<<taskid<<": "<<endl;
-		for(int k=0;k<r1.size();k++){
-			cerr<<"{";
-			for(int l=0;l<r1[k].size();l++){
-				cerr<<r1[k][l]<<" ";
-			}
-			cerr<<"}";
-		}
-		cerr<<endl;
-		for(int k=0;k<r2.size();k++){
-			cerr<<"{";
-			for(int l=0;l<r2[k].size();l++){
-				cerr<<r2[k][l]<<" ";
-			}
-			cerr<<"}";
-		}
-		cerr<<endl;
-	    }
+
 
 		r1 = Graph::join(Graph(r1),var1,Graph(r2),var2).relation;
 
@@ -275,9 +257,6 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 	vector<int> unfolded=unfold(r1);
 	int unfoldSize=unfolded.size();
 	int unfoldSizes[numtasks];
-	if(taskid==1){
-		cerr<<"on task "<<taskid<<": unfoldSize = "<<unfoldSize<<endl;
-	}
 	MPI_Gather(&unfoldSize,1,MPI_INT,unfoldSizes,1,MPI_INT,0,MPI_COMM_WORLD);
 	int displs[numtasks];
 	int recvSize;
