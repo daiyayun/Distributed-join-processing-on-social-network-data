@@ -188,18 +188,47 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 	}
 
 	for(int i=1; i<n; i++){
+
 		vector<vector<int> >::iterator it2;
-		var2 = v[i];
+
+		//x = findCommon(var1, var2);
+
 		r2.clear();
-		for(it2 = g[i].relation.begin(); it1 != g[i].relation.end(); it1++){
+		for(it2 = g[i].relation.begin(); it2 != g[i].relation.end(); it2++){
 			if(Graph::hash((*it2)[x[1][0]])%numtasks==taskid)
 				r2.push_back(*it2);
+
 		}
+		// cerr<<"int the "<<i<<"-th iteration: ";
+		// cerr<<"r1 size on rank "<<taskid<<":::::::::::::::::::::::"<<r1.size()<<endl;
+
+		// cerr<<"r2 size on rank "<<taskid<<":::::::::::::::::::::::"<<r2.size()<<endl;
+		if(i==2 && taskid==1){
+		cerr<<"on task "<<taskid<<": "<<endl;
+		for(int k=0;k<r1.size();k++){
+			cerr<<"{";
+			for(int l=0;l<r1[k].size();l++){
+				cerr<<r1[k][l]<<" ";
+			}
+			cerr<<"}";
+		}
+		cerr<<endl;
+		for(int k=0;k<r2.size();k++){
+			cerr<<"{";
+			for(int l=0;l<r2[k].size();l++){
+				cerr<<r2[k][l]<<" ";
+			}
+			cerr<<"}";
+		}
+		cerr<<endl;
+	    }
 
 		r1 = Graph::join(Graph(r1),var1,Graph(r2),var2).relation;
+
 		//if(r1.empty()) {cerr<<"the relations are not joinable."; return NULL;}
 
 		if(i!=n-1){
+			var2 = v[i+1];
 			vector<vector<int> > buf[numtasks];
 			int size[numtasks];
 			for(int j=0; j<numtasks; j++) size[j] = 0;
@@ -236,21 +265,34 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 				}
 			}
 			r1=fold(unfoldRecv,var1.size());
+
+
 			
 		}
 	}
+
+
 	vector<int> unfolded=unfold(r1);
 	int unfoldSize=unfolded.size();
 	int unfoldSizes[numtasks];
+	if(taskid==1){
+		cerr<<"on task "<<taskid<<": unfoldSize = "<<unfoldSize<<endl;
+	}
 	MPI_Gather(&unfoldSize,1,MPI_INT,unfoldSizes,1,MPI_INT,0,MPI_COMM_WORLD);
 	int displs[numtasks];
-	displs[0] = 0;
-	for (int i = 1; i < numtasks; ++i){
-		displs[i] = unfoldSizes[i-1] + displs[i-1];
+	int recvSize;
+	vector<int> gatheredRaw;
+	if(taskid==0){
+		displs[0] = 0;
+		for (int i = 1; i < numtasks; ++i){
+			displs[i] = unfoldSizes[i-1] + displs[i-1];
+		}
+		recvSize=displs[numtasks-1]+unfoldSizes[numtasks-1];
+
+		gatheredRaw=vector<int>(recvSize);
 	}
-	int recvSize=displs[numtasks-1]+unfoldSizes[numtasks-1];
-	vector<int> gatheredRaw(recvSize);
 	if(unfoldSize==0){
+
 		MPI_Gatherv(NULL,0,MPI_INT,&gatheredRaw[0],unfoldSizes,displs,MPI_INT,0,MPI_COMM_WORLD);
 	} else {
 		MPI_Gatherv(&unfolded[0],unfoldSize,MPI_INT,&gatheredRaw[0],unfoldSizes,displs,MPI_INT,0,MPI_COMM_WORLD);
@@ -258,7 +300,9 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 	}
 	if(taskid==0){
 		r1=fold(gatheredRaw,r1[0].size());
+
 	}
+
 	return Graph(r1);
 
 }

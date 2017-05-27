@@ -37,13 +37,13 @@ int main(int argc, char **argv){
 		cerr<<"Testing join..."<<endl;
 		cerr<<"Finding triangles in "<< fileName << endl;		
 	}
-
 	Graph graph[3]; 
 	graph[0] = graph[1] = graph[2] = g;
 	vector<string> v[3];
 	v[0].push_back("x1");v[0].push_back("x2");
 	v[1].push_back("x2");v[1].push_back("x3");
 	v[2].push_back("x1");v[2].push_back("x3");
+
 	Graph triangles = Graph::multiMPIJoin(graph, v, 3);
 
 	if(taskid==0){
