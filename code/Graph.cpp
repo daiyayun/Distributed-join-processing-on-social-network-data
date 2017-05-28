@@ -65,26 +65,26 @@ void Graph::saveTo(string path){
 	else cerr<<"Unable to open file";
 }
 
-void Graph::saveRelation(vector<vector<int> >& r, string& path){
-	using namespace std;
-	int l=r[0].size();
-	ofstream myfile(path.c_str());
-	if(myfile.is_open()){
-		vector<vector<int> >::iterator it;
-		for(it = r.begin(); it != r.end(); it++){
-			int i=0;
-			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
-				myfile<<(*jt);
-				if(i<l-1)
-					myfile<<" ";
-				i++;
-			}
-			myfile << endl;
-		}
-		myfile.close();
-	}
-	else cerr<<"Unable to open file";
-}
+// void Graph::saveRelation(vector<vector<int> >& r, string& path){
+// 	using namespace std;
+// 	int l=r[0].size();
+// 	ofstream myfile(path.c_str());
+// 	if(myfile.is_open()){
+// 		vector<vector<int> >::iterator it;
+// 		for(it = r.begin(); it != r.end(); it++){
+// 			int i=0;
+// 			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
+// 				myfile<<(*jt);
+// 				if(i<l-1)
+// 					myfile<<" ";
+// 				i++;
+// 			}
+// 			myfile << endl;
+// 		}
+// 		myfile.close();
+// 	}
+// 	else cerr<<"Unable to open file";
+// }
 
 
 //join two relations
@@ -213,6 +213,7 @@ int unionSize(vector<string> v1, vector<string> v2){
 	return joinedVar(v1,v2).size();
 }
 
+//get the combined list of variables
 vector<string> joinedVar(vector<string>& v1, vector<string>& v2){
 	vector<string> result;
 	int n1=v1.size();

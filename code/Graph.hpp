@@ -38,7 +38,7 @@ public:
 	static Graph mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2);
 	static Graph multiMPIJoin(Graph* g, vector<string>* v, int n);//join any number of relations
 	static Graph HyperCubeJoin(Graph& g);// a join method that does not need to communicate the intermediate results
-	static void saveRelation(vector<vector<int> >& r, string& path);//save a relation to a file
+	//static void saveRelation(vector<vector<int> >& r, string& path);//save a relation to a file
 	static uint32_t hash(uint32_t a);
 };
 
