@@ -39,7 +39,7 @@ int main(int argc, char **argv){
 	var2.push_back("x2");var2.push_back("x3");
 
 	
-	Graph gJoined=Graph::join(g1,var1,g2,var2);
+	Graph gJoined=Graph::join(&g1,var1,&g2,var2);
 	cerr<<"Join done."<<endl;
 	if(!gJoined.isEmpty()){
 		gJoined.saveTo(pathJoined);

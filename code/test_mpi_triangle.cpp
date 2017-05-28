@@ -51,7 +51,7 @@ int main(int argc, char **argv){
 	}
 
 	Graph gJoined,gJoined1;
-	gJoined=Graph::MPIJoin(g,var1,g,var2);
+	gJoined=Graph::MPIJoin(&g,var1,&g,var2);
 //	cerr<<"first result is empty: "<<gJoined.isEmpty()<<endl;
 	vector<int> gJoinedUnfolded;
 	int unfoldedLength;
@@ -87,7 +87,7 @@ int main(int argc, char **argv){
 	
 	gJoinedRefolded=fold(gJoinedUnfolded,arityJoined);
 	gJoined.relation=gJoinedRefolded;
-	gJoined1=Graph::MPIJoin(gJoined,var3,g,var4);
+	gJoined1=Graph::MPIJoin(&gJoined,var3,&g,var4);
 
 
 	if(taskid==0){

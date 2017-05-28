@@ -19,13 +19,13 @@
 
 using namespace std;
 
-Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
+Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2){
 	int taskid,numtasks;
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
-	vector<vector<int> > r1=g1.relation;
-	vector<vector<int> > r2=g2.relation;
+	vector<vector<int> > r1=g1->relation;
+	vector<vector<int> > r2=g2->relation;
 	vector<vector<int> > x = findCommon(var1, var2);
 	int arityJoined=unionSize(var1,var2);//arity of joined relation	
 
@@ -59,7 +59,9 @@ Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 	//for(int i=0; i<numtasks; i++) msg[i] = i;
 
 	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
-	gJoinedLocal = Graph::join(Graph(buf[taskid][0]),var1,Graph(buf[taskid][1]),var2);
+	Graph gLocal1=Graph(buf[taskid][0]);
+	Graph gLocal2=Graph(buf[taskid][1]);
+	gJoinedLocal = Graph::join(&gLocal1,var1,&gLocal2,var2);
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -94,13 +96,13 @@ Graph Graph::MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var
 
 }
 
-Graph Graph::mpiJoinHash(Graph g1, vector<string> var1, Graph g2, vector<string> var2){
+Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2){
 	int taskid,numtasks;
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
-	vector<vector<int> > r1=g1.relation;
-	vector<vector<int> > r2=g2.relation;
+	vector<vector<int> > r1=g1->relation;
+	vector<vector<int> > r2=g2->relation;
 	vector<vector<int> > x = findCommon(var1, var2);
 	int arityJoined=unionSize(var1,var2);//arity of joined relation	
 
@@ -134,7 +136,9 @@ Graph Graph::mpiJoinHash(Graph g1, vector<string> var1, Graph g2, vector<string>
 	//for(int i=0; i<numtasks; i++) msg[i] = i;
 
 	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
-	gJoinedLocal = Graph::join(Graph(buf[taskid][0]),var1,Graph(buf[taskid][1]),var2);
+	Graph gLocal1=Graph(buf[taskid][0]);
+	Graph gLocal2=Graph(buf[taskid][1]);
+	gJoinedLocal = Graph::join(&gLocal1,var1,&gLocal2,var2);
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -204,8 +208,9 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 
 		// cerr<<"r2 size on rank "<<taskid<<":::::::::::::::::::::::"<<r2.size()<<endl;
 
-
-		r1 = Graph::join(Graph(r1),var1,Graph(r2),var2).relation;
+		Graph gLocal1=Graph(r1);
+		Graph gLocal2=Graph(r2);
+		r1 = Graph::join(&gLocal1,var1,&gLocal2,var2).relation;
 
 		//if(r1.empty()) {cerr<<"the relations are not joinable."; return NULL;}
 
@@ -299,12 +304,13 @@ Graph Graph::HyperCubeJoin(Graph& g){
 	m1 = taskid/(m*m);
 	m2 = taskid%(m*m)/m;
 	m3 = taskid%(m*m)%m;
+   
 	for(it = g.relation.begin(); it != g.relation.end(); it++){
-		if((Graph::hash((*it)[0])==m1)&&(Graph::hash((*it)[1]==m2)))
+		if((Graph::hash((*it)[0])%m==m1)&&(Graph::hash((*it)[1])%m==m2))
 			r1.push_back(*it);
-		if((Graph::hash((*it)[0])==m2)&&(Graph::hash((*it)[1]==m3)))
+		if((Graph::hash((*it)[0])%m==m2)&&(Graph::hash((*it)[1])%m==m3))
 			r2.push_back(*it);
-		if((Graph::hash((*it)[0])==m1)&&(Graph::hash((*it)[1]==m3)))
+		if((Graph::hash((*it)[0])%m==m1)&&(Graph::hash((*it)[1])%m==m3))
 			r3.push_back(*it);
 	}
 	vector<string> var1,var2,var3,var;
@@ -312,8 +318,10 @@ Graph Graph::HyperCubeJoin(Graph& g){
 	var2.push_back("x2");var2.push_back("x3");
 	var3.push_back("x1");var3.push_back("x3");
 	var = joinedVar(var1, var2);
-	r = Graph::join(Graph(r1),var1,Graph(r2),var2).relation;
-	r = Graph::join(Graph(r),var,Graph(r3),var3).relation;
+	Graph g1(r1); Graph g2(r2);
+	r = Graph::join(&g1,var1,&g2,var2).relation;
+	Graph g12(r); Graph g3(r3);
+	r = Graph::join(&g12,var,&g3,var3).relation;
 
 	vector<int> unfoldSend=unfold(r);
 	vector<int> unfoldRecv;
@@ -342,8 +350,9 @@ Graph Graph::HyperCubeJoin(Graph& g){
 	}
 	if(taskid==0){
 		r=fold(unfoldRecv,3);
-		return Graph(r);
-	}
 
+	}
+	return Graph(r);
 
 }
+

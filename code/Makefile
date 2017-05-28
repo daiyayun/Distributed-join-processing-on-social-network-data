@@ -4,7 +4,7 @@
 # Author: yayundai & zejianli
 
 LINK_TARGET = test_join test_mpi_triangle test_MPI_multi_Join test_Hyper
-OBJS = test_join.o Graph.o test_mpi_triangle.o test_mpi_join.o test_MPI_multi_Join.o test_Hyper.o
+OBJS = test_join.o Graph.o test_mpi_triangle.o test_mpi_join.o test_MPI_multi_Join.o test_Hyper.o mpi_join.o
 
 REBUILDABLES = $(OBJS) $(LINK_TARGET)
 

@@ -38,7 +38,7 @@ Graph::Graph(string path){
 }
 
 //order a relation with a given permutation
-void Graph::order(vector<int> perm){
+void Graph::order(const vector<int>& perm){
 	using namespace std;	
 	sort(this->relation.begin(),this->relation.end(),Compare(perm));
 }
@@ -88,7 +88,7 @@ void Graph::saveRelation(vector<vector<int> >& r, string& path){
 
 
 //join two relations
-Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
+Graph Graph::join(Graph* r1, vector<string> v1, Graph* r2, vector<string> v2){
 	using namespace std;
 	vector<vector<int> > x = findCommon(v1, v2);
 	int l1 = v1.size();//number of variables in graph r1
@@ -118,8 +118,8 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 			perm2[i] = count;
 		}
 	}
-	r1.order(perm1);
-	r2.order(perm2);
+	r1->order(perm1);
+	r2->order(perm2);
 
 	// join the two relations:
 	// iterate over the two relations in parallel starting at the first tuple in each
@@ -130,18 +130,18 @@ Graph Graph::join(Graph r1, vector<string> v1, Graph r2, vector<string> v2){
 	//   If π(t) is lexicographically smaller than π(t'), go to the next tuple t;
 	//   Otherwise, go to the next tuple t'.
 
-	vector<vector<int> >::iterator it1 = r1.relation.begin();
-	vector<vector<int> >::iterator it2 = r2.relation.begin();
+	vector<vector<int> >::iterator it1 = r1->relation.begin();
+	vector<vector<int> >::iterator it2 = r2->relation.begin();
 	Graph g;//the joined graph
-	while((it1!=r1.relation.end())&&(it2!=r2.relation.end())){
+	while((it1!=r1->relation.end())&&(it2!=r2->relation.end())){
 		bool flag = customCompare((*it1),(*it2),x);
 		if(flag){           //If t and t' coincide on X
 			int pos = 1;
-			while(((it2+pos)!=r2.relation.end())&&customCompare(*it1,*(it2+pos),x)){
+			while(((it2+pos)!=r2->relation.end())&&customCompare(*it1,*(it2+pos),x)){
 				pos++;
 			}
 
-			while((it1!=r1.relation.end())&&(it2!=r2.relation.end())&&customCompare(*it1,*it2,x)){
+			while((it1!=r1->relation.end())&&(it2!=r2->relation.end())&&customCompare(*it1,*it2,x)){
 				for(int i = 0; i < pos; i++){
 					vector<int> v;
 					for(int j = 0; j < l1; j++){
@@ -289,3 +289,5 @@ uint32_t Graph::hash(uint32_t a)
    a = (a^0xb55a4f09) ^ (a>>16);
    return a;
 }
+
+

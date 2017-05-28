@@ -31,11 +31,11 @@ public:
 		return relation[0].size();
 	}//get the arity of the relation
 	bool isEmpty(){return relation.empty();}
-	void order(vector<int> perm);//order the relation with a given permuation
+	void order(const vector<int>& perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
-	static Graph join(Graph r1, vector<string> v1, Graph r2, vector<string> v2);//join two relations
-	static Graph MPIJoin(Graph g1, vector<string> var1, Graph g2, vector<string> var2);//join two reltions using mpi
-	static Graph mpiJoinHash(Graph g1, vector<string> var1, Graph g2, vector<string> var2);
+	static Graph join(Graph* r1, vector<string> v1, Graph* r2, vector<string> v2);//join two relations
+	static Graph MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2);//join two reltions using mpi
+	static Graph mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2);
 	static Graph multiMPIJoin(Graph* g, vector<string>* v, int n);//join any number of relations
 	static Graph HyperCubeJoin(Graph& g);// a join method that does not need to communicate the intermediate results
 	static void saveRelation(vector<vector<int> >& r, string& path);//save a relation to a file
@@ -45,7 +45,7 @@ public:
 //define a comparator to order the relation
 struct Compare{
 	vector<int> perm;
-	Compare(vector<int>& perm){this->perm=perm;}
+	Compare(const vector<int>& perm){this->perm=perm;}
 
 	bool operator()(const vector<int>& l1,const vector<int>& l2){
 		int n=perm.size();
