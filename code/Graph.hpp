@@ -39,7 +39,7 @@ public:
 	static Graph multiMPIJoin(Graph* g, vector<string>* v, int n);//join any number of relations
 	static Graph HyperCubeJoin(Graph& g);// a join method that does not need to communicate the intermediate results
 	//static void saveRelation(vector<vector<int> >& r, string& path);//save a relation to a file
-	static uint32_t hash(uint32_t a);
+	//static uint32_t hash(uint32_t a);
 };
 
 //define a comparator to order the relation
@@ -84,7 +84,7 @@ vector<vector<int> > findCommon(vector<string>& v1, vector<string>& v2);
 
 /**
  * \brief calculate the list of variables of the joined relation
- */
+*/
 
 vector<string> joinedVar(vector<string>& v1, vector<string>& v2) ;
 
@@ -121,3 +121,8 @@ vector<vector<int> > fold(vector<int>& unfolded, const int& blockSize);
 */
 
 vector<int> unfold(vector<vector<int> >& mat);
+
+/**
+* \brief an integer hash function
+*/
+uint32_t myhash(uint32_t a);

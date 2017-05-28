@@ -280,7 +280,7 @@ vector<vector<int> > fold(vector<int>& unfolded, const int& blockSize){
 	return res;
 }
 
-uint32_t Graph::hash(uint32_t a)
+uint32_t myhash(uint32_t a)
 {
    a = (a+0x7ed55d16) + (a<<12);
    a = (a^0xc761c23c) ^ (a>>19);

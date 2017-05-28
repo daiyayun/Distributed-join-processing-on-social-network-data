@@ -24,10 +24,10 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 	MPI_Comm_rank(MPI_COMM_WORLD, &taskid);
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 
-	vector<vector<int> > r1=g1->relation;
-	vector<vector<int> > r2=g2->relation;
+	vector<vector<int> > r1 = g1->relation;
+	vector<vector<int> > r2 = g2->relation;
 	vector<vector<int> > x = findCommon(var1, var2);
-	int arityJoined=unionSize(var1,var2);//arity of joined relation	
+	int arityJoined = unionSize(var1,var2);//arity of joined relation	
 
 	//int ilocal;	
 	Graph gJoinedLocal,gJoined;
@@ -126,11 +126,11 @@ Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<strin
 	vector<vector<int> >::iterator it2;
 
 	for(it1=r1.begin(); it1!=r1.end(); it1++){
-		buf[Graph::hash((*it1)[x[0][0]])%numtasks][0].push_back(*it1);
+		buf[myhash((*it1)[x[0][0]])%numtasks][0].push_back(*it1);
 	}
 
 	for(it2=r2.begin(); it2!=r2.end(); it2++){
-		buf[Graph::hash((*it2)[x[1][0]])%numtasks][1].push_back(*it2);
+		buf[myhash((*it2)[x[1][0]])%numtasks][1].push_back(*it2);
 	}
 	//int msg[numtasks];
 	//for(int i=0; i<numtasks; i++) msg[i] = i;
@@ -187,44 +187,39 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 
 	//distribute the first relation to each machine
 	for(it1 = g[0].relation.begin(); it1 != g[0].relation.end(); it1++){
-		if(Graph::hash((*it1)[x[0][0]])%numtasks==taskid)
+		if(myhash((*it1)[x[0][0]])%numtasks==taskid)
 			r1.push_back(*it1);
 	}
 
 	for(int i=1; i<n; i++){
 
 		vector<vector<int> >::iterator it2;
-
-		//x = findCommon(var1, var2);
-
+		//distribute the second relation to each machine
 		r2.clear();
 		for(it2 = g[i].relation.begin(); it2 != g[i].relation.end(); it2++){
-			if(Graph::hash((*it2)[x[1][0]])%numtasks==taskid)
+			if(myhash((*it2)[x[1][0]])%numtasks == taskid)
 				r2.push_back(*it2);
 
 		}
-		// cerr<<"int the "<<i<<"-th iteration: ";
-		// cerr<<"r1 size on rank "<<taskid<<":::::::::::::::::::::::"<<r1.size()<<endl;
-
-		// cerr<<"r2 size on rank "<<taskid<<":::::::::::::::::::::::"<<r2.size()<<endl;
-
+		//join the two relations
 		Graph gLocal1=Graph(r1);
 		Graph gLocal2=Graph(r2);
 		r1 = Graph::join(&gLocal1,var1,&gLocal2,var2).relation;
 
-		//if(r1.empty()) {cerr<<"the relations are not joinable."; return NULL;}
-
+		//distribute the intermediate results
 		if(i!=n-1){
 			var2 = v[i+1];
-			vector<vector<int> > buf[numtasks];
-			int size[numtasks];
-			for(int j=0; j<numtasks; j++) size[j] = 0;
+			vector<vector<int> > buf[numtasks];//buf[i] stores the intermediate results to be sent to machine i
+			int size[numtasks];//size[i] records the number of intermediate results to be sent
+			for(int j=0; j<numtasks; j++) size[j] = 0;//initialize the numbers
 			var1 = joinedVar(var1, var2);
 			x = findCommon(var1, var2);
+			//get buf[] and size[] ready to be sent
 			for(it1 = r1.begin(); it1 != r1.end(); it1++){
-				buf[Graph::hash((*it1)[x[0][0]])%numtasks].push_back(*it1);
-				size[Graph::hash((*it1)[x[0][0]])%numtasks]+=var1.size();
+				buf[myhash((*it1)[x[0][0]])%numtasks].push_back(*it1);
+				size[myhash((*it1)[x[0][0]])%numtasks]+=var1.size();
 			}
+			//let each machine how many results they are expected to receive from other machines
 			int rcvCount[numtasks];
 			for(int j = 0 ; j<numtasks; ++j){
 				MPI_Gather(&size[j],1,MPI_INT,rcvCount,1,MPI_INT,j,MPI_COMM_WORLD);
@@ -244,6 +239,7 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 				sizeRecv+=rcvCount[j];
 			}
 			vector<int> unfoldRecv(sizeRecv);
+			//each machine gathers the intermediate results 
 			for(int j=0; j<numtasks; ++j){
 				if(unfoldSend[j].size()==0){
 					MPI_Gatherv(NULL,0,MPI_INT,&unfoldRecv[0],rcvCount,displs,MPI_INT,j,MPI_COMM_WORLD);
@@ -251,14 +247,11 @@ Graph Graph::multiMPIJoin(Graph* g, vector<string>* v, int n){
 					MPI_Gatherv(&unfoldSend[j][0],size[j],MPI_INT,&unfoldRecv[0],rcvCount,displs,MPI_INT,j,MPI_COMM_WORLD);
 				}
 			}
-			r1=fold(unfoldRecv,var1.size());
-
-
-			
+			r1=fold(unfoldRecv,var1.size());		
 		}
 	}
 
-
+	//gather all the results
 	vector<int> unfolded=unfold(r1);
 	int unfoldSize=unfolded.size();
 	int unfoldSizes[numtasks];
@@ -300,19 +293,21 @@ Graph Graph::HyperCubeJoin(Graph& g){
 	if(pow(m, 3)!=numtasks) {cerr<<"the number of machines must be a cuber of an integer!"; exit(EXIT_FAILURE);}
 	vector<vector<int> > r, r1, r2, r3;
 	vector<vector<int> >::iterator it;
-	int m1,m2,m3;
+	int m1,m2,m3;//encode the machine
 	m1 = taskid/(m*m);
 	m2 = taskid%(m*m)/m;
 	m3 = taskid%(m*m)%m;
    
+    //distribute the entries
 	for(it = g.relation.begin(); it != g.relation.end(); it++){
-		if((Graph::hash((*it)[0])%m==m1)&&(Graph::hash((*it)[1])%m==m2))
+		if((myhash((*it)[0])%m==m1)&&(myhash((*it)[1])%m==m2))
 			r1.push_back(*it);
-		if((Graph::hash((*it)[0])%m==m2)&&(Graph::hash((*it)[1])%m==m3))
+		if((myhash((*it)[0])%m==m2)&&(myhash((*it)[1])%m==m3))
 			r2.push_back(*it);
-		if((Graph::hash((*it)[0])%m==m1)&&(Graph::hash((*it)[1])%m==m3))
+		if((myhash((*it)[0])%m==m1)&&(myhash((*it)[1])%m==m3))
 			r3.push_back(*it);
 	}
+	//join the sub-relations in each machine
 	vector<string> var1,var2,var3,var;
 	var1.push_back("x1");var1.push_back("x2");
 	var2.push_back("x2");var2.push_back("x3");
@@ -323,6 +318,7 @@ Graph Graph::HyperCubeJoin(Graph& g){
 	Graph g12(r); Graph g3(r3);
 	r = Graph::join(&g12,var,&g3,var3).relation;
 
+	//gather the results
 	vector<int> unfoldSend=unfold(r);
 	vector<int> unfoldRecv;
 
