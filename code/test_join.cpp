@@ -20,8 +20,8 @@ int main(int argc, char **argv){
 		fileName1=argv[1]; 
 		fileName2=argv[2];
 	} else{
-		fileName1="test";//the name of the default file to be read
-		fileName2="test1";
+		fileName1="test_sorted";//the name of the default file to be read
+		fileName2="test1_sorted";
 	}	
 	const string path1 = "../"+fileName1+".dat";
 	const string path2 = "../"+fileName2+".dat";
@@ -38,15 +38,19 @@ int main(int argc, char **argv){
 	vector<string> var2;
 	var2.push_back("x2");var2.push_back("x3");
 
-	
-	Graph gJoined=Graph::join(&g1,var1,&g2,var2);
-	cerr<<"Join done."<<endl;
-	if(!gJoined.isEmpty()){
-		gJoined.saveTo(pathJoined);
-		cerr<<"Written to "+pathJoined<<endl;		
-	} else {
-		cerr<<"Empty graph, nothing to save !"<<endl;
-	}
+	Graph::joinTo(&g1,var1,&g2,var2,pathJoined);
+	cerr<<"Written to "+pathJoined<<endl;
+	// Graph* gJoined=Graph::join(&g1,var1,&g2,var2);
+	// cerr<<"Join done."<<endl;
+	// cerr<<"joined size: "<<gJoined->size;
+	// cerr<<" joined arity: "<<gJoined->arity<<endl;;
+	// if(!gJoined->isEmpty()){
+	// 	gJoined->saveTo(pathJoined);
+	// 	cerr<<"Written to "+pathJoined<<endl;		
+	// } else {
+	// 	cerr<<"Empty graph, nothing to save !"<<endl;
+	// }
+	// delete gJoined;
 
 	return 0;
 

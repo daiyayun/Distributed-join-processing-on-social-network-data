@@ -4,7 +4,7 @@
  *  Created on: May 7, 2017
  *		Author: yayundai & zejianli
 */
-#include <ctime>
+
 #include <string>
 #include <vector>
 #include <iostream>
@@ -52,18 +52,15 @@ int main(int argc, char **argv){
 	var3.push_back("x1");var3.push_back("x3");
 	vector<string> var;//=joinedVar(var1,var2);
 	var.push_back("x1");var.push_back("x2");var.push_back("x3");
-
-    clock_t t = clock();
 	Graph* gJoined=Graph::MPIJoin(g,var1,g,var2,useHash);
 	int firstJoinEmpty=1;
-	int length;
-	int* rJoined;
+
 	if(taskid==0){
 		cerr<<"First join done."<<endl;
 		if(!gJoined->isEmpty()){
-			length=gJoined->arity*gJoined->size;
+			gJoined->saveTo(pathInterm);
+			delete gJoined;	
 			firstJoinEmpty=0;
-			rJoined=gJoined->relation;
 		}else{
 			cerr<<"Empty graph, nothing to save !"<<endl;
 		}
@@ -73,24 +70,17 @@ int main(int argc, char **argv){
 		MPI_Finalize();
 		return 0;
 	}
-	MPI_Bcast(&length,1,MPI_INT,0,MPI_COMM_WORLD);
-	if(taskid!=0) rJoined=new int[length];
-	MPI_Bcast(rJoined,length,MPI_INT,0,MPI_COMM_WORLD);
-	if(taskid!=0) gJoined=new Graph(rJoined,var.size(),length/var.size());
-	gJoined=Graph::MPIJoin(gJoined,var,g,var3,useHash);
-    t = clock() - t;
-	delete rJoined;
+	Graph* g1=new Graph(pathInterm);
+	Graph* gResult=Graph::MPIJoin(g1,var,g,var3,useHash);
+	delete g1;
 	delete g;
+	//if(taskid==1)gResult->print();
 	if(taskid==0){
 		cerr<<"join done."<<endl;
-		cout <<endl
-     	    <<"execution time: "
-        	<<(t*1000)/CLOCKS_PER_SEC
-         	<<"ms\n\n";
-		if(!gJoined->isEmpty()){
-			gJoined->saveTo(pathJoined);
+		if(!gResult->isEmpty()){
+			gResult->saveTo(pathJoined);
 			cerr<<"written to "<<pathJoined<<endl;
-			delete gJoined;
+			delete gResult;
 		}else{
 			cerr<<"Empty graph, nothing to save !"<<endl;
 		}

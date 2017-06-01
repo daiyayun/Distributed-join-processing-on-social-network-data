@@ -4,7 +4,7 @@
  *  Created on: May 26, 2017
  *		Author: yayundai & zejianli
 */
-
+#include <ctime>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -38,14 +38,17 @@ int main(int argc, char **argv){
 		cerr<<"Finding triangles in "<< fileName << endl;		
 	}
 
-	
-	Graph triangles = Graph::HyperCubeJoin(g);
-
+    clock_t t = clock();	
+	Graph* triangles = Graph::HyperCubeJoin(&g);
+	t=clock()-t;
 	if(taskid==0){
-
+	    cout <<endl
+             <<"execution time: "
+             <<(t*1000)/CLOCKS_PER_SEC
+             <<"ms\n\n";
 		cerr<<"Join done."<<endl;
 		
-		triangles.saveTo(pathJoined);
+		triangles->saveTo(pathJoined);
 		cerr<<"Written to "+pathJoined<<endl;		
 	}
 	MPI_Finalize();
