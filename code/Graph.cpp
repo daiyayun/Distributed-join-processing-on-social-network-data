@@ -12,6 +12,8 @@
 #include <vector>
 #include <algorithm>
 
+ #include <math.h>
+
 
 #include "Graph.hpp"
 
@@ -404,15 +406,10 @@ bool customCompare(int* v1,int* v2, vector<vector<int> > commonPos){
 
 
 
-uint32_t myhash(uint32_t a)
+int myhash(int key)
 {
-   a = (a+0x7ed55d16) + (a<<12);
-   a = (a^0xc761c23c) ^ (a>>19);
-   a = (a+0x165667b1) + (a<<5);
-   a = (a+0xd3a2646c) ^ (a<<9);
-   a = (a+0xfd7046c5) + (a<<3);
-   a = (a^0xb55a4f09) ^ (a>>16);
-   return a;
+	using namespace std;
+	return key*2654435761%(int)pow(2,32);
 }
 
 

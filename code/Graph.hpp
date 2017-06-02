@@ -102,4 +102,4 @@ int unionSize(vector<string> v1, vector<string> v2);
 /**
 * \brief an integer hash function
 */
-uint32_t myhash(uint32_t a);
+int myhash(int a);
