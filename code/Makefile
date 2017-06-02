@@ -12,8 +12,10 @@ all: $(LINK_TARGET)
 
 test_join: test_join.o Graph.o
 	g++ -o $@ $^
+
 test_mpi_join: test_mpi_join.o Graph.o mpi_join.o
 	mpic++ -o $@ $^
+
 test_mpi_triangle: test_mpi_triangle.o mpi_join.o Graph.o
 	mpic++ -o $@ $^
 
@@ -25,6 +27,7 @@ test_Hyper: test_Hyper.o mpi_join.o Graph.o
 
 test_sort: test_sort.o Graph.o
 	g++ -o $@ $^
+	
 %.o: %.cpp
 	mpic++ -o $@ -c $<
 
