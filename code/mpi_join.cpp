@@ -25,20 +25,14 @@ Graph* Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> 
 	MPI_Comm_size(MPI_COMM_WORLD, &numtasks);
 	int a1=g1->arity;
 	int a2=g2->arity;
-	//int* r1 = g1->relation;
-	//int* r2 = g2->relation;
-	//int* r1Last=g1->relation+(g1->size-1)*a1;
-	//int* r2Last=g2->relation+(g2->size-1)*a2;
 	vector<vector<int> > x = findCommon(var1, var2);
 	int arityJoined = unionSize(var1,var2);//arity of joined relation	
-
-	//int ilocal;	
+	
 	Graph* gJoinedLocal;
 	Graph* gJoined;
 	vector<vector<int> >* buf=new vector<vector<int> >[numtasks];
 	int lengths[numtasks];//length of each local join result
 	int displs[numtasks];// displacement of each local join result w.r.t. address of receive buffer
-	//vector<int> gatheredRaw; //gathered join result in 1D
 	int* gathered; 
 	
 	//assigning the task for each process
@@ -76,8 +70,7 @@ Graph* Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> 
 		}
 	}
 
-
-
+	//gLocal1Rel and gLocalRel2 are the two sub-relations that to be joined locally
 	int* gLocal1Rel=new int[buf[taskid][0].size()];
 	int* gLocal2Rel=new int[buf[taskid][1].size()];
 	
@@ -90,11 +83,11 @@ Graph* Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> 
 	Graph* gLocal1=new Graph(gLocal1Rel,a1,buf[taskid][0].size()/a1);
 	Graph* gLocal2=new Graph(gLocal2Rel,a2,buf[taskid][1].size()/a2);
 
-
 	delete[] buf;
 	gJoinedLocal = Graph::join(gLocal1,var1,gLocal2,var2);
 	delete gLocal1;
 	delete gLocal2;
+
 	int lengthLocal=gJoinedLocal->size*gJoinedLocal->arity;
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -136,7 +129,7 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 	vector<string> var2 = v[1];
 	vector<vector<int> > x = findCommon(var1, var2);
 	//distribute the first relation to each machine
-	vector<int> r1buf,r2buf;
+	vector<int> r1buf,r2buf;//we use first a vector because we don't know the size of the sub-relation
 	int* r1;
 	int* r2;
 	for(int i=0; i<g[0]->size; i++){
@@ -148,13 +141,12 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 	}
 	r1=new int[r1buf.size()];
 	for(int i=0;i<r1buf.size();i++){
-		r1[i]=r1buf[i];
+		r1[i]=r1buf[i];//transfer a vector to an array
 	}
 
 	int a1,s1,a2,s2;
-	a1=g[0]->arity;
-	s1=r1buf.size()/a1;
-	//vector<int>().swap(r1buf);
+	a1=g[0]->arity;//the arity of the sub-relation r1
+	s1=r1buf.size()/a1;//the size of the sub-relation r2
 	Graph* gJoined;
 
 	for(int i=1; i<n; i++){
@@ -173,8 +165,8 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 			r2[j]=r2buf[j];
 		}
 
-		a2=g[i]->arity;
-		s2=r2buf.size()/a2;
+		a2=g[i]->arity;//the arity of the sub-relation r2
+		s2=r2buf.size()/a2;//the size of the sub-relation r2
 
 		//join the two relations
 		Graph gLocal1=Graph(r1,a1,s1);
@@ -188,6 +180,7 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 			for(int j=0; j<numtasks; j++) size[j] = 0;//initialize the numbers
 			var1 = joinedVar(var1, var2);
 			x = findCommon(var1, var2);
+			
 			//get buf[] and size[] ready to be sent
 		
 			for(int j=0;j<gJoined->size;j++){
@@ -204,9 +197,6 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 			for(int j = 0 ; j<numtasks; ++j){
 				MPI_Gather(&size[j],1,MPI_INT,rcvCount,1,MPI_INT,j,MPI_COMM_WORLD);
 			}
-			
-
-
 			int displs[numtasks];
 			displs[0] = 0;
 			for (int j = 1; j < numtasks; ++j){
@@ -217,10 +207,7 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 				sizeRecv+=rcvCount[j];
 			}
 
-
-
 			r1=new int[sizeRecv];
-
 
 			//each machine gathers the intermediate results 
 			for(int j=0; j<numtasks; ++j){
@@ -233,10 +220,10 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 			}
 			a1=var1.size();
 			s1=sizeRecv/a1;
-
-
 		}
 	}
+
+	//free the bufs
 	vector<int>().swap(r1buf);
 	vector<int>().swap(r2buf);
 	//gather all the results
@@ -252,20 +239,16 @@ Graph* Graph::multiMPIJoin(Graph** g, vector<string>* v, int n){
 			displs[i] = size[i-1] + displs[i-1];
 		}
 		recvSize=displs[numtasks-1]+size[numtasks-1];
-
 		gathered=new int[recvSize];
 	}
 	if(sizeLocal==0){
-
 		MPI_Gatherv(NULL,0,MPI_INT,gathered,size,displs,MPI_INT,0,MPI_COMM_WORLD);
 	} else {
 		MPI_Gatherv(gJoined->relation,sizeLocal,MPI_INT,gathered,size,displs,MPI_INT,0,MPI_COMM_WORLD);
-
 	}
 	if(taskid==0){
 		a1=unionSize(var1,var2);
 		s1=recvSize/a1;
-
 	}
 
 	return new Graph(gathered,a1,s1);
@@ -279,7 +262,7 @@ Graph* Graph::HyperCubeJoin(Graph* g){
 
 	int m = (int)cbrt(numtasks);
 	if(pow(m, 3)!=numtasks) {cerr<<"the number of machines must be a cuber of an integer!"; exit(EXIT_FAILURE);}
-	vector<int>  rbuf[3];
+	vector<int>  rbuf[3];//three sub-relations to be joined, we use vector because the size is unknown
 	int m1,m2,m3;//encode the machine
 	m1 = taskid/(m*m);
 	m2 = taskid%(m*m)/m;
@@ -297,10 +280,11 @@ Graph* Graph::HyperCubeJoin(Graph* g){
 			for(int j=0;j<g->arity;j++)
 				rbuf[2].push_back(g->at(i,j));
 	}
-	int sRes;
+	int sRes;//size of the final relation
 	int a=g->arity;
-	int s[3];
-	int* r[3];
+	int s[3];//size of the three sub-relations
+	int* r[3];//three sub-relations
+	//transfer the vectors to arrays
 	for(int i=0;i<3;i++){
 		s[i]=rbuf[i].size();
 		r[i]=new int[s[i]];
@@ -310,10 +294,10 @@ Graph* Graph::HyperCubeJoin(Graph* g){
 		s[i]/=a;
 	}
 
+	//free the bufs
 	for(int i=0;i<3;i++){
 		vector<int>().swap(rbuf[i]);
 	}
-
 	
 	//join the sub-relations in each machine
 	vector<string> var1,var2,var3,var;
@@ -325,6 +309,7 @@ Graph* Graph::HyperCubeJoin(Graph* g){
 	Graph* gJoined = Graph::join(&g1,var1,&g2,var2);
 	Graph g3(r[2],a,s[2]);
 	gJoined = Graph::join(gJoined,var,&g3,var3);
+
 	//gather the results
 	int* gathered;
 	int lengthLocal=gJoined->size*gJoined->arity;
@@ -351,7 +336,7 @@ Graph* Graph::HyperCubeJoin(Graph* g){
 		MPI_Gatherv(gJoined->relation,lengthLocal,MPI_INT,gathered,lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}
 	if(taskid==0){
-		a=unionSize(var,var3);
+		a=unionSize(var,var3);//the size of the final relation
 		sRes=length/a;
 	}
 

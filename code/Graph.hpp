@@ -10,46 +10,41 @@
 #include <algorithm>
 #include <stdint.h>
 
-;
-
-
 using namespace std;
+
 const bool USE_HASH=true;
 const bool NO_HASH=false;
+
 //define a classe named Graph to store a relation and related methods
 class Graph{
 public:
 	Graph(){}
 	Graph(string path);//construct a graph from a given data path;
+	//construct a graph from a given relation and its arity and size
 	Graph(int* r,int arity, int size){this->relation=r;this->arity=arity;this->size=size;};
 	~Graph(){delete[] relation;};
 
-
+	//members
 	int arity;
 	int size;
 	int* relation;
 
-	//void clean(){delete[] relation;}
-
+	//methods
 	int at(int i,int j){ return relation[i*arity+j];};
 	bool isEmpty(){return size==0;}
 	void order(const vector<int>& perm);//order the relation with a given permuation
 	void saveTo(string path);//save the relation to a fiven file path
-	static void joinTo(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2, string path);
-	void print();
-	static Graph* join(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2);//join two relations
+	void print();//print the relation directly to the screen
+	static void joinTo(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2, string path);//join two relations and save the result directly to a file
+	static Graph* join(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2);//join two relations and return the joined relation
 	static Graph* MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2,bool useHash);//join two reltions using mpi
-	//static Graph MPIJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<string> var2);
 	static Graph* multiMPIJoin(Graph** g, vector<string>* v, int n);//join any number of relations
 	static Graph* HyperCubeJoin(Graph* g);// a join method that does not need to communicate the intermediate results
-	//static void saveRelation(vector<vector<int> >& r, string& path);//save a relation to a file
-	//static uint32_t hash(uint32_t a);
 };
 
 //define a comparator to order the relation
 struct Compare{
 	vector<int> perm;
-	//int arity;
 	Compare(const vector<int>& perm){this->perm=perm;}
 
 	bool operator()(int* l1,int* l2){
@@ -97,9 +92,7 @@ bool customCompare(int* v1, int* v2, vector<vector<int> > commonPos);
 
 int unionSize(vector<string> v1, vector<string> v2);
 
-
-
 /**
-* \brief an integer hash function
+* \brief an integer hash function: Knuth's multiplicative method
 */
 int myhash(int a);

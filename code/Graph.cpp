@@ -11,9 +11,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
-
- #include <math.h>
-
+#include <math.h>
 
 #include "Graph.hpp"
 
@@ -55,26 +53,21 @@ Graph::Graph(string path){
 		while(getline(myfile,line)){
 			//write data into the class
 			if(line.compare(lastLine)){
-				// cerr<<"lastLine: "<<lastLine<<endl;
-				// cerr<<"this line: "<<line<<endl;
-				// cerr<<"press enter to continue"<<endl;
-				// cin.get();
 				istringstream iss(line);
 				string s;
 				while(getline(iss, s, ' ')){
-					//tuple.push_back(stoi(s));
 					relation[i]=atoi(s.c_str());
 					i++;
 				}
 				lastLine=line;
 			}
-
 		}
 		myfile.close();
 
 	}
 	else std::cerr<<"Unable to open file"<<endl;
 }
+
 void Graph::print(){
 	using namespace std;
 		for(int i=0;i<size;i++){
@@ -86,6 +79,7 @@ void Graph::print(){
 			cerr << endl;
 		}	
 }
+
 //save the relation to a given path
 void Graph::saveTo(string path){
 	using namespace std;
@@ -124,6 +118,8 @@ void Graph::order(const vector<int>& perm){
 	}
 	delete[] relationSorted;
 }
+
+//join two relations and save the result directly to a file
 void Graph::joinTo(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2, string path){
 	using namespace std;
 	int arityJoined = unionSize(v1,v2);//arity of joined relation	
@@ -170,8 +166,7 @@ void Graph::joinTo(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2, s
 	int* it2 = g2->relation;
 	int* g1Last=g1->relation+(g1->size-1)*l1;
 	int* g2Last=g2->relation+(g2->size-1)*l2;
-	//Graph g;//the joined graph
-	//vector<int> gRel;
+
 	ofstream myfile(path.c_str());
 	if(myfile.is_open()){
 		while((it1<=g1Last)&&(it2<=g2Last)){
@@ -233,7 +228,7 @@ void Graph::joinTo(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2, s
 }
 
 
-//join two relations
+//join two relations, return the joined relation
 Graph* Graph::join(Graph* g1, vector<string> v1, Graph* g2, vector<string> v2){
 	using namespace std;
 	vector<vector<int> > x = findCommon(v1, v2);
@@ -405,7 +400,7 @@ bool customCompare(int* v1,int* v2, vector<vector<int> > commonPos){
 };
 
 
-
+//Knuth's multiplicative method
 int myhash(int key)
 {
 	using namespace std;

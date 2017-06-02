@@ -18,7 +18,6 @@
 //construct a graph from a data file
 Graph::Graph(string path){
 	using namespace std;
-	vector<vector<int> > relation;
 	string line;
 	ifstream myfile(path.c_str());
 	if(myfile.is_open()){
@@ -34,15 +33,6 @@ Graph::Graph(string path){
 			relation.push_back(tuple);
 		}
 		myfile.close();
-		relationUnfolded=unfold(relation);
-		if(relation.empty()){
-			this->arity=0;
-			this->size=0;
-		} else {
-			this->size=relation.size();
-			this->arity=relation[0].size();
-		}
-
 	}
 	else std::cerr<<"Unable to open file"<<endl;
 }
@@ -56,13 +46,17 @@ void Graph::order(const vector<int>& perm){
 //save the relation to a given path
 void Graph::saveTo(string path){
 	using namespace std;
+	int l=getArity();
 	ofstream myfile(path.c_str());
 	if(myfile.is_open()){
-		for(int i=0;i<size;i++){
-			for(int j=0;j<arity;j++){
-				myfile<<this->at(i,j);
-				if(j<arity-1)
+		vector<vector<int> >::iterator it;
+		for(it = relation.begin(); it != relation.end(); it++){
+			int i=0;
+			for(vector<int>::iterator jt=it->begin();jt!=it->end();jt++){
+				myfile<<(*jt);
+				if(i<l-1)
 					myfile<<" ";
+				i++;
 			}
 			myfile << endl;
 		}
@@ -124,7 +118,6 @@ Graph Graph::join(Graph* r1, vector<string> v1, Graph* r2, vector<string> v2){
 			perm2[i] = count;
 		}
 	}
-	cerr<<"ordering graphs"<<endl;
 	r1->order(perm1);
 	r2->order(perm2);
 
@@ -136,7 +129,7 @@ Graph Graph::join(Graph* r1, vector<string> v1, Graph* r2, vector<string> v2){
 	// If π(t) and π(t') are different two cases can occur: 
 	//   If π(t) is lexicographically smaller than π(t'), go to the next tuple t;
 	//   Otherwise, go to the next tuple t'.
-	cerr<<"graphs ordered."<<endl;
+
 	vector<vector<int> >::iterator it1 = r1->relation.begin();
 	vector<vector<int> >::iterator it2 = r2->relation.begin();
 	Graph g;//the joined graph
@@ -276,14 +269,13 @@ vector<int> unfold(vector<vector<int> >& mat){
 
 vector<vector<int> > fold(vector<int>& unfolded, const int& blockSize){
 	int size=unfolded.size()/blockSize;
-	vector<vector<int> > res(size);
+	vector<vector<int> > res;
 	for(int i=0;i<size;i++){
-		vector<int> line(blockSize);
+		vector<int> line;
 		for(int j=0;j<blockSize;j++){
-			line[j]=unfolded[i*blockSize+j];
+			line.push_back(unfolded[i*blockSize+j]);
 		}
-		//if(i%100000==0) cerr<<"folding "<<i<<" th line of "<<size<<" lines."<<endl;
-		res[i]=line;
+		res.push_back(line);
 	}
 	return res;
 }

@@ -32,14 +32,13 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 	//int ilocal;	
 	Graph gJoinedLocal,gJoined;
 	vector<int> unfoldedLocal;	//local join result unfolded in 1D
-	vector<vector<vector<int> > >* buf=new vector<vector<vector<int> > >[numtasks];
+	vector<vector<vector<int> > > buf[numtasks];
 	int lengths[numtasks];//length of each local join result
 	int displs[numtasks];// displacement of each local join result w.r.t. address of receive buffer
 	vector<int> gatheredRaw; //gathered join result in 1D
 	vector<vector<int> > gathered; //gathered join result reconstructed in 2D
 	
 	//assigning the task for each process
-	
 	for(int i=0;i<numtasks;i++){
 		vector<vector<int> > tmp1,tmp2;
 		buf[i].push_back(tmp1);
@@ -48,7 +47,7 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 	}
 	vector<vector<int> >::iterator it1;
 	vector<vector<int> >::iterator it2;
-	cerr<<"writing buffer"<<endl;
+
 	for(it1=r1.begin(); it1!=r1.end(); it1++){
 		buf[((*it1)[x[0][0]])%numtasks][0].push_back(*it1);
 	}
@@ -56,20 +55,13 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 	for(it2=r2.begin(); it2!=r2.end(); it2++){
 		buf[(*it2)[x[1][0]]%numtasks][1].push_back(*it2);
 	}
-	cerr<<"buffer written. Creating local graphs"<<endl;
 	//int msg[numtasks];
 	//for(int i=0; i<numtasks; i++) msg[i] = i;
 
 	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
 	Graph gLocal1=Graph(buf[taskid][0]);
 	Graph gLocal2=Graph(buf[taskid][1]);
-	delete[] buf;
-	cerr<<"local graphs created, buf deleted.Joining local graphs"<<endl;
 	gJoinedLocal = Graph::join(&gLocal1,var1,&gLocal2,var2);
-	cerr<<"local graphs joined."<<endl;
-	gLocal1.clean();
-	gLocal2.clean();
-	cerr<<"local graphs cleaned. Preparing to gather data."<<endl;
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -78,8 +70,8 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 		for(int i=0;i<numtasks;i++){
 			length+=lengths[i];
 		}
-		// cerr<<"total length of data to receive : "<<length<<endl;
-		// cerr<<"Receiving data..."<<endl;
+		cerr<<"total length of data to receive : "<<length<<endl;
+		cerr<<"Receiving data..."<<endl;
 		gatheredRaw=vector<int>(length);
 		for(int i=0;i<numtasks;i++){
 			displs[i]=0;
@@ -89,30 +81,18 @@ Graph Graph::MPIJoin(Graph* g1, vector<string> var1, Graph* g2, vector<string> v
 		}
 
 	}
-	cerr<<"unfolding local join result."<<endl;
 	unfoldedLocal=unfold(gJoinedLocal.relation);
-	cerr<<"local join result unfolded."<<endl;
-	gJoinedLocal.clean();
-	cerr<<"local joined graph cleaned. Gathering data."<<endl;
 	//when there is nothing to send, send a null pointer.
 	if(unfoldedLocal.size()==0){
 		 MPI_Gatherv(NULL,0,MPI_INT,&gatheredRaw[0],lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}else{
 		MPI_Gatherv(&unfoldedLocal[0],lengthLocal,MPI_INT,&gatheredRaw[0],lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}
-	cerr<<"data gathered to root"<<endl;
-	vector<int>().swap(unfoldedLocal);
-	cerr<<"local unfolded result cleaned."<<endl;
 	if(taskid==0){
-		// cerr<<"folding gathered data."<<endl;
-		// gathered=fold(gatheredRaw,arityJoined);
-		//cerr<<"gathered data folded."<<endl;
-		//vector<int>().swap(gatheredRaw);
-		//cerr<<"gathered raw data cleaned."<<endl;
-		gJoined=Graph(gatheredRaw);
-		cerr<<"gJoined created"<<endl;
+		gathered=fold(gatheredRaw,arityJoined);
+		gJoined=Graph(gathered);
+		return gJoined;
 	}
-	return gJoined;
 
 }
 
@@ -129,7 +109,7 @@ Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<strin
 	//int ilocal;	
 	Graph gJoinedLocal,gJoined;
 	vector<int> unfoldedLocal;	//local join result unfolded in 1D
-	vector<vector<vector<int> > >* buf=new vector<vector<vector<int> > >[numtasks];
+	vector<vector<vector<int> > > buf[numtasks];
 	int lengths[numtasks];//length of each local join result
 	int displs[numtasks];// displacement of each local join result w.r.t. address of receive buffer
 	vector<int> gatheredRaw; //gathered join result in 1D
@@ -158,10 +138,7 @@ Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<strin
 	//MPI_Scatter(msg,1,MPI_INT,&ilocal,1,MPI_INT,0,MPI_COMM_WORLD);
 	Graph gLocal1=Graph(buf[taskid][0]);
 	Graph gLocal2=Graph(buf[taskid][1]);
-	delete[] buf;
 	gJoinedLocal = Graph::join(&gLocal1,var1,&gLocal2,var2);
-	gLocal1.clean();
-	gLocal2.clean();
 	int lengthLocal=gJoinedLocal.getSize()*gJoinedLocal.getArity();
 	//gather length information from each process, prepare space for receiving 
 	MPI_Gather(&lengthLocal,1,MPI_INT,lengths,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -170,8 +147,8 @@ Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<strin
 		for(int i=0;i<numtasks;i++){
 			length+=lengths[i];
 		}
-		// cerr<<"total length of data to receive : "<<length<<endl;
-		// cerr<<"Receiving data..."<<endl;
+		cerr<<"total length of data to receive : "<<length<<endl;
+		cerr<<"Receiving data..."<<endl;
 		gatheredRaw=vector<int>(length);
 		for(int i=0;i<numtasks;i++){
 			displs[i]=0;
@@ -182,17 +159,14 @@ Graph Graph::mpiJoinHash(Graph* g1, vector<string> var1, Graph* g2, vector<strin
 
 	}
 	unfoldedLocal=unfold(gJoinedLocal.relation);
-	gJoinedLocal.clean();
 	//when there is nothing to send, send a null pointer.
 	if(unfoldedLocal.size()==0){
 		 MPI_Gatherv(NULL,0,MPI_INT,&gatheredRaw[0],lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}else{
 		MPI_Gatherv(&unfoldedLocal[0],lengthLocal,MPI_INT,&gatheredRaw[0],lengths,displs,MPI_INT,0,MPI_COMM_WORLD);
 	}
-	vector<int>().swap(unfoldedLocal);
 	if(taskid==0){
 		gathered=fold(gatheredRaw,arityJoined);
-		vector<int>().swap(gatheredRaw);
 		gJoined=Graph(gathered);
 		return gJoined;
 	}
