@@ -1,5 +1,5 @@
 /*
- * MPI_join.cpp
+ * test_mpi_triangle.cpp
  *
  *  Created on: May 7, 2017
  *		Author: yayundai & zejianli
