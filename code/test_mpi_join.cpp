@@ -41,9 +41,9 @@ int main(int argc, char **argv){
 	Graph g2(path2);
 	
 	vector<string> var1;
-	var1.push_back("x1");var1.push_back("x2");var1.push_back("x3");
+	var1.push_back("x1");var1.push_back("x2");
 	vector<string> var2;
-	var2.push_back("x1");var2.push_back("x3");
+	var2.push_back("x2");var2.push_back("x3");
 	Graph* gJoined=Graph::MPIJoin(&g1,var1,&g2,var2,USE_HASH);
 
 	if(taskid==0){

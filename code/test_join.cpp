@@ -20,8 +20,8 @@ int main(int argc, char **argv){
 		fileName1=argv[1]; 
 		fileName2=argv[2];
 	} else{
-		fileName1="test_sorted";//the name of the default file to be read
-		fileName2="test1_sorted";
+		fileName1="test";//the name of the default file to be read
+		fileName2="test1";
 	}	
 	const string path1 = "../"+fileName1+".dat";
 	const string path2 = "../"+fileName2+".dat";
